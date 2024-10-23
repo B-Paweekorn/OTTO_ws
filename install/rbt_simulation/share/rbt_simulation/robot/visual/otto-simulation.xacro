@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example">
+
+    <!-- Declare PI -->
+    <xacro:property name="PI" value="3.14159265359"/>
+
+    <!-- Base Link -->
+    <link name="base_link">
+        <visual>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.37"/>
+            <geometry>
+                <box size="0.13 0.15 0.13"/> 
+            </geometry>
+        </visual>
+
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.3"/>
+            <geometry>
+                <box size="0.13 0.15 0.13"/> 
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Hip Motor Left -->
+    <link name="hip_motorL">
+        <visual>
+            <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+            <geometry>
+                <cylinder radius="0.035" length="0.03"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <!-- Knee link Left -->
+    <link name="knee_linkL">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.1"/> 
+          <geometry>
+              <cylinder radius="0.01" length="0.2"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <!-- Leg link Left -->
+    <link name="leg_linkL">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.1"/> 
+          <geometry>
+              <cylinder radius="0.01" length="0.2"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <!-- wheel link Left -->
+    <link name="wheel_linkL">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+              <cylinder radius="0.1" length="0.025"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <joint name="base_to_hip_motorL" type="continuous">
+      <parent link="base_link"/>
+      <child link="hip_motorL"/>
+        <origin rpy="0.0 ${-3*PI/4} 0.0" xyz="0.0 0.075 0.37"/>
+        <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="hip_motorL_to_knee_linkL" type="continuous">
+      <parent link="hip_motorL"/>
+      <child link="knee_linkL"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="knee_linkL_to_leg_linkL" type="continuous">
+      <parent link="knee_linkL"/>
+      <child link="leg_linkL"/>
+      <origin rpy="0.0 ${-PI/2} 0.0" xyz="0.0 0.0 0.2"/>
+      <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="leg_linkL_wheel_linkL" type="continuous">
+      <parent link="leg_linkL"/>
+      <child link="wheel_linkL"/>
+      <origin rpy="${-PI/2} 0.0 0.0" xyz="0.0 0.0 0.2"/>
+      <axis xyz="0.0 0.0 0.1"/>
+    </joint>
+
+    <!-- Right Side -->
+
+    <!-- Hip Motor Right -->
+    <link name="hip_motorR">
+        <visual>
+            <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+            <geometry>
+                <cylinder radius="0.035" length="0.03"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <!-- Knee link Right -->
+    <link name="knee_linkR">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.1"/> 
+          <geometry>
+              <cylinder radius="0.01" length="0.2"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <!-- Leg link Right -->
+    <link name="leg_linkR">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.1"/> 
+          <geometry>
+              <cylinder radius="0.01" length="0.2"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <!-- wheel link Right -->
+    <link name="wheel_linkR">
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+              <cylinder radius="0.1" length="0.025"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <joint name="base_to_hip_motorR" type="continuous">
+      <parent link="base_link"/>
+      <child link="hip_motorR"/>
+        <origin rpy="0.0 ${-3*PI/4} 0.0" xyz="0.0 -0.075 0.37"/>
+        <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="hip_motorR_to_knee_linkR" type="continuous">
+      <parent link="hip_motorR"/>
+      <child link="knee_linkR"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="knee_linkR_to_leg_linkR" type="continuous">
+      <parent link="knee_linkR"/>
+      <child link="leg_linkR"/>
+      <origin rpy="0.0 ${-PI/2} 0.0" xyz="0.0 0.0 0.2"/>
+      <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+
+    <joint name="leg_linkR_wheel_linkR" type="continuous">
+      <parent link="leg_linkR"/>
+      <child link="wheel_linkR"/>
+      <origin rpy="${-PI/2} 0.0 0.0" xyz="0.0 0.0 0.2"/>
+      <axis xyz="0.0 0.0 1.0"/>
+    </joint>
+
+</robot>

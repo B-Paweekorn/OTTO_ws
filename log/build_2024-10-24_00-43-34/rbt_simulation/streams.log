@@ -1,0 +1,57 @@
+[0.011s] Invoking command in '/home/chawre/OTTO_ws/build/rbt_simulation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --build /home/chawre/OTTO_ws/build/rbt_simulation -- -j16 -l16
+[0.052s] [100%] Built target cpp_node_test
+[0.057s] [100%] Built target ament_cmake_python_copy_rbt_simulation
+[0.256s] running egg_info
+[0.257s] writing rbt_simulation.egg-info/PKG-INFO
+[0.257s] writing dependency_links to rbt_simulation.egg-info/dependency_links.txt
+[0.257s] writing top-level names to rbt_simulation.egg-info/top_level.txt
+[0.259s] reading manifest file 'rbt_simulation.egg-info/SOURCES.txt'
+[0.259s] writing manifest file 'rbt_simulation.egg-info/SOURCES.txt'
+[0.279s] [100%] Built target ament_cmake_python_build_rbt_simulation_egg
+[0.289s] Invoked command in '/home/chawre/OTTO_ws/build/rbt_simulation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --build /home/chawre/OTTO_ws/build/rbt_simulation -- -j16 -l16
+[0.321s] Invoking command in '/home/chawre/OTTO_ws/build/rbt_simulation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --install /home/chawre/OTTO_ws/build/rbt_simulation
+[0.326s] -- Install configuration: ""
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/pythonpath.sh
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/pythonpath.dsv
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info
+[0.327s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/top_level.txt
+[0.327s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/SOURCES.txt
+[0.327s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/PKG-INFO
+[0.327s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/dependency_links.txt
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation/__init__.py
+[0.327s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation/dummy_module.py
+[0.354s] Listing '/home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation'...
+[0.357s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/lib/rbt_simulation/dummy_script.py
+[0.357s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/lib/rbt_simulation/cpp_node_test
+[0.357s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/config
+[0.357s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/config/display.rviz
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_3.stl
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/end_effector.stl
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_0.stl
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_2.stl
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_1.stl
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/launch
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/launch/simple_display.launch.py
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual
+[0.358s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/otto-simulation.xacro
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/01-myfirst.urdf
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/otto-simulation.urdf
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/package_run_dependencies/rbt_simulation
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/parent_prefix_path/rbt_simulation
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/ament_prefix_path.sh
+[0.358s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/ament_prefix_path.dsv
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/path.sh
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/path.dsv
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.bash
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.sh
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.zsh
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.dsv
+[0.359s] -- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/package.dsv
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/packages/rbt_simulation
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/cmake/rbt_simulationConfig.cmake
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/cmake/rbt_simulationConfig-version.cmake
+[0.359s] -- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/package.xml
+[0.361s] Invoked command in '/home/chawre/OTTO_ws/build/rbt_simulation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --install /home/chawre/OTTO_ws/build/rbt_simulation
