@@ -13,6 +13,7 @@
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/end_effector.stl
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_0.stl
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_2.stl
+/home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/Body.STL
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link_1.stl
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/launch/simple_display.launch.py
 /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/otto-simulation.xacro

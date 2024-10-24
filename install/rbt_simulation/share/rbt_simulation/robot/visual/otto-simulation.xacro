@@ -9,7 +9,7 @@
         <visual>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
-                <box size="0.13 0.15 0.13"/> 
+              <mesh filename='package://rbt_simulation/meshes/Body.STL' scale="0.001 0.001 0.001"/>
             </geometry>
         </visual>
 
