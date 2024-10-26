@@ -72,12 +72,62 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        hip_linkL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        hip_linkR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         hip_motorL:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        hip_motorR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        knee_linkL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        knee_linkR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         knee_motorL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        knee_motorR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg_linkL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg_linkR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_linkL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_linkR:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -97,9 +147,29 @@ Visualization Manager:
         All Enabled: true
         base_link:
           Value: true
+        hip_linkL:
+          Value: true
+        hip_linkR:
+          Value: true
         hip_motorL:
           Value: true
+        hip_motorR:
+          Value: true
+        knee_linkL:
+          Value: true
+        knee_linkR:
+          Value: true
         knee_motorL:
+          Value: true
+        knee_motorR:
+          Value: true
+        leg_linkL:
+          Value: true
+        leg_linkR:
+          Value: true
+        wheel_linkL:
+          Value: true
+        wheel_linkR:
           Value: true
       Marker Scale: 0.30000001192092896
       Name: TF
@@ -110,7 +180,20 @@ Visualization Manager:
         base_link:
           hip_motorL:
             knee_motorL:
-              {}
+              hip_linkL:
+                {}
+              knee_linkL:
+                leg_linkL:
+                  wheel_linkL:
+                    {}
+          hip_motorR:
+            knee_motorR:
+              hip_linkR:
+                {}
+              knee_linkR:
+                leg_linkR:
+                  wheel_linkR:
+                    {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -159,16 +242,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.5449273586273193
+      Distance: 0.7071390151977539
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.012387240305542946
-        Y: -0.04202555492520332
-        Z: 0.3030852675437927
+        X: -0.0922100692987442
+        Y: 0.10958317667245865
+        Z: -0.0865660309791565
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
