@@ -1,0 +1,57 @@
+[  0%] Built target ament_cmake_python_copy_rbt_simulation
+[100%] Built target cpp_node_test
+running egg_info
+writing rbt_simulation.egg-info/PKG-INFO
+writing dependency_links to rbt_simulation.egg-info/dependency_links.txt
+writing top-level names to rbt_simulation.egg-info/top_level.txt
+reading manifest file 'rbt_simulation.egg-info/SOURCES.txt'
+writing manifest file 'rbt_simulation.egg-info/SOURCES.txt'
+[100%] Built target ament_cmake_python_build_rbt_simulation_egg
+-- Install configuration: ""
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/pythonpath.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/pythonpath.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/top_level.txt
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/PKG-INFO
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation/__init__.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation/dummy_module.py
+Listing '/home/chawre/OTTO_ws/install/rbt_simulation/local/lib/python3.10/dist-packages/rbt_simulation'...
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/lib/rbt_simulation/dummy_script.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/lib/rbt_simulation/cpp_node_test
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/config
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/config/display.rviz
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/CyberGearmotor.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/ODrive Botwheel.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link2R.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link4.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link1R.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link1.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/Body.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link2.STL
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/meshes/link4R.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/launch
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/launch/simple_display.launch.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/otto-simulation.xacro
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/01-myfirst.urdf
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/robot/visual/otto-simulation.urdf
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/package_run_dependencies/rbt_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/parent_prefix_path/rbt_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/ament_prefix_path.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/path.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/environment/path.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.bash
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.zsh
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/local_setup.dsv
+-- Installing: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/package.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/ament_index/resource_index/packages/rbt_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/cmake/rbt_simulationConfig.cmake
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/cmake/rbt_simulationConfig-version.cmake
+-- Up-to-date: /home/chawre/OTTO_ws/install/rbt_simulation/share/rbt_simulation/package.xml
