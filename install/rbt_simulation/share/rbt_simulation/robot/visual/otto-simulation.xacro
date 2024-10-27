@@ -6,6 +6,12 @@
 
     <!-- Base Link -->
     <link name="base_link">
+        <inertial>
+          <origin xyz="-0.03 0.0 0.0" rpy="0 0 0"/>
+          <mass value="5.0"/>
+          <inertia ixx="0.553912" iyy="1.227224" izz="1.101448" ixy="-0.0" iyz="-0.0" ixz="0.005005"/>
+        </inertial>
+        
         <visual>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
@@ -16,7 +22,7 @@
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
-                <box size="0.13 0.15 0.13"/> 
+                <box size="0.20 0.19 0.15"/> 
             </geometry>
         </collision>
     </link>
@@ -54,7 +60,7 @@
     <!-- Knee link Left -->
     <link name="knee_linkL">
       <visual>
-          <origin rpy="${PI} ${-PI/2} 0.0" xyz="0.0 0.0 0.0"/> 
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://rbt_simulation/meshes/link2.STL' scale="0.001 0.001 0.001"/>
           </geometry>
@@ -73,12 +79,24 @@
 
     <!-- wheel link Left -->
     <link name="wheel_linkL">
+      <inertial>
+        <origin xyz="0.0 0.02 0.0" rpy="0 0 0"/>
+        <mass value="1"/>
+        <inertia ixx="0.025678" iyy="0.046537" izz="0.025678" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+
       <visual>
           <origin rpy="${PI} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://rbt_simulation/meshes/ODriveBotwheel.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.02 0.0"/>
+        <geometry>
+            <cylinder radius="0.086" length="0.04416"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <joint name="hip_jointL" type="continuous">
@@ -112,7 +130,7 @@
     <joint name="virtualhip_jointL" type="continuous">
       <parent link="knee_linkL"/>
       <child link="leg_linkL"/>
-      <origin rpy="0.0 0.0 0.0" xyz="-0.13718 -0.05 -0.14554"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
     </joint>
 
@@ -177,12 +195,24 @@
 
     <!-- wheel link Right -->
     <link name="wheel_linkR">
+      <inertial>
+        <origin xyz="0.0 -0.02 0.0" rpy="0 0 0"/>
+        <mass value="1.0"/>
+        <inertia ixx="0.025678" iyy="0.046537" izz="0.025678" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://rbt_simulation/meshes/ODriveBotwheel.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 -0.02 0.0"/>
+        <geometry>
+            <cylinder radius="0.086" length="0.04416"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <joint name="hip_jointR" type="continuous">
@@ -217,7 +247,7 @@
     <joint name="virtualhip_jointR" type="continuous">
       <parent link="knee_linkR"/>
       <child link="leg_linkR"/>
-      <origin rpy="0.0 0.0 0.0" xyz="-0.13718 0.05 -0.14554"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
     </joint>
 

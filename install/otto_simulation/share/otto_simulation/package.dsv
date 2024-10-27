@@ -1,0 +1,8 @@
+source;share/otto_simulation/hook/cmake_prefix_path.ps1
+source;share/otto_simulation/hook/cmake_prefix_path.dsv
+source;share/otto_simulation/hook/cmake_prefix_path.sh
+source;share/otto_simulation/local_setup.bash
+source;share/otto_simulation/local_setup.dsv
+source;share/otto_simulation/local_setup.ps1
+source;share/otto_simulation/local_setup.sh
+source;share/otto_simulation/local_setup.zsh

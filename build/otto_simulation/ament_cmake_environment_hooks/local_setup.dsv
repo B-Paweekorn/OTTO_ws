@@ -1,0 +1,3 @@
+source;share/otto_simulation/environment/ament_prefix_path.sh
+source;share/otto_simulation/environment/path.sh
+source;share/otto_simulation/environment/pythonpath.sh
