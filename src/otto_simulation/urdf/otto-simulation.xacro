@@ -1,8 +1,15 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example">
-
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="otto">
     <!-- Declare PI -->
     <xacro:property name="PI" value="3.14159265359"/>
+    <xacro:include filename="gazebo.xacro"/>
+    <link name="world"></link>
+
+    <joint name="base_joint" type="fixed">
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <parent link="world"/>
+      <child link="base_link"/>        
+    </joint>
 
     <!-- Base Link -->
     <link name="base_link">
@@ -29,52 +36,107 @@
 
     <!-- Hip Motor Left -->
     <link name="hip_motorL">
-        <visual>
-            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
-            <geometry>
-              <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
-            </geometry>
-        </visual>
-    </link>
-
-    <!-- Knee Motor Left -->
-    <link name="knee_motorL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Knee Motor Left -->
+    <link name="knee_motorL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+            <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
+          </geometry>
+      </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link>
 
     <!-- Hip link Left -->
     <link name="hip_linkL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link1.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- Knee link Left -->
     <link name="knee_linkL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link2.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- Leg link Left -->
     <link name="leg_linkL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link4.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- wheel link Left -->
@@ -97,6 +159,7 @@
             <cylinder radius="0.086" length="0.04416"/> 
         </geometry>
       </collision>
+      
     </link> 
 
     <joint name="hip_jointL" type="continuous">
@@ -145,52 +208,107 @@
 
     <!-- Hip Motor Right -->
     <link name="hip_motorR">
-        <visual>
-            <origin rpy="${PI} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
-            <geometry>
-              <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
-            </geometry>
-        </visual>
-    </link>
-
-    <!-- Knee Motor Right -->
-    <link name="knee_motorR">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="${PI} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Knee Motor Right -->
+    <link name="knee_motorR">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+      <visual>
+          <origin rpy="${PI} 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+            <mesh filename='package://otto_simulation/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
+          </geometry>
+      </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link>
 
     <!-- Hip link Right -->
     <link name="hip_linkR">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link1R.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- Knee link Right -->
     <link name="knee_linkR">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link2R.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- Leg link Right -->
     <link name="leg_linkR">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
           <geometry>
             <mesh filename='package://otto_simulation/meshes/link4R.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+            <box size="1e-3 1e-3 1e-3"/> 
+        </geometry>
+      </collision>
     </link> 
 
     <!-- wheel link Right -->

@@ -8,6 +8,7 @@
 /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation/dummy_module.py
 /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/dummy_script.py
 /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/cpp_node_test
+/home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/config/joints_controller.yaml
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_gazebo.launch.py
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_description.launch.py
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_display.launch.py
@@ -22,6 +23,7 @@
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link4R.STL
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz/display.rviz
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/otto-simulation.xacro
+/home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/gazebo.xacro
 /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/package_run_dependencies/otto_simulation
 /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/parent_prefix_path/otto_simulation
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.sh

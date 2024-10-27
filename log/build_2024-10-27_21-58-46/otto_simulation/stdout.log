@@ -1,0 +1,59 @@
+[100%] Built target cpp_node_test
+[100%] Built target ament_cmake_python_copy_otto_simulation
+running egg_info
+writing otto_simulation.egg-info/PKG-INFO
+writing dependency_links to otto_simulation.egg-info/dependency_links.txt
+writing top-level names to otto_simulation.egg-info/top_level.txt
+reading manifest file 'otto_simulation.egg-info/SOURCES.txt'
+writing manifest file 'otto_simulation.egg-info/SOURCES.txt'
+[100%] Built target ament_cmake_python_build_otto_simulation_egg
+-- Install configuration: ""
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/pythonpath.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/pythonpath.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/top_level.txt
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/PKG-INFO
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation/__init__.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation/dummy_module.py
+Listing '/home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation'...
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/dummy_script.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/cpp_node_test
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/config
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/config/joints_controller.yaml
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_gazebo.launch.py
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_description.launch.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_display.launch.py
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/CyberGearmotor.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link2R.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/ODriveBotwheel.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link4.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link1R.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link1.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/Body.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link2.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link4R.STL
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz/display.rviz
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/otto-simulation.xacro
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/gazebo.xacro
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/package_run_dependencies/otto_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/parent_prefix_path/otto_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/path.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/path.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.bash
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.sh
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.zsh
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.dsv
+-- Installing: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/package.dsv
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/packages/otto_simulation
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/cmake/otto_simulationConfig.cmake
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/cmake/otto_simulationConfig-version.cmake
+-- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/package.xml

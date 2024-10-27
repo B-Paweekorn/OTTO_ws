@@ -20,8 +20,6 @@ def generate_launch_description():
                                   parameters=parameters
     )
 
-
     launch_description = LaunchDescription()
     launch_description.add_action(robot_state_publisher)
-    
     return launch_description
