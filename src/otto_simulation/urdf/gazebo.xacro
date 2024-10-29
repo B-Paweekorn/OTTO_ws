@@ -6,11 +6,8 @@
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
         <joint name="hip_jointL">
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
             <command_interface name="velocity"/>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -19,10 +16,7 @@
         </joint>
         <joint name="knee_jointL">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -31,10 +25,7 @@
         </joint>
         <joint name="virtualhip_jointL">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -43,10 +34,7 @@
         </joint>
         <joint name="wheel_jointL">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -56,11 +44,8 @@
 
 
         <joint name="hip_jointR">
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
             <command_interface name="velocity"/>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -69,10 +54,7 @@
         </joint>
         <joint name="knee_jointR">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -81,10 +63,7 @@
         </joint>
         <joint name="virtualhip_jointR">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -93,10 +72,7 @@
         </joint>
         <joint name="wheel_jointR">
             <command_interface name="velocity"/>
-            <command_interface name="position">
-                <param name="min">-3.14</param>
-                <param name="max">3.14</param>
-            </command_interface>
+            <command_interface name="position"/>
             <state_interface name="position">
                 <param name="initial_value">0.0</param>
             </state_interface>
@@ -152,7 +128,6 @@
     <gazebo reference="wheel_linkL">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <material>Gazebo/Black</material>
     </gazebo>
     
 
@@ -190,6 +165,5 @@
     <gazebo reference="wheel_linkR">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <material>Gazebo/Black</material>
     </gazebo>
 </robot>
