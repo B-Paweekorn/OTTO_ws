@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="otto">
+    <!-- Declare PI -->
+    <xacro:property name="PI" value="3.14159265359"/>
+    <!-- <xacro:include filename="gazebo.xacro"/> -->
+    <xacro:include filename="inertial_macros.xacro"/>
+    <link name="world"></link>
+
+    <joint name="base_joint" type="fixed">
+      <origin xyz="0 0 0.40" rpy="0 0 0"/>
+      <parent link="world"/>
+      <child link="base_link"/>        
+    </joint>
+
+    <!-- Base Link -->
+    <link name="base_link">
+        <inertial>
+          <origin xyz="-0.03 0.0 0.0" rpy="0 0 0"/>
+          <mass value="5.0"/>
+          <inertia ixx="0.553912" iyy="1.227224" izz="1.101448" ixy="-0.0" iyz="-0.0" ixz="0.005005"/>
+        </inertial>
+        
+        <visual>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+              <mesh filename='file:///$(find otto_simulation)/meshes/Body.STL' scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="0.20 0.19 0.15"/> 
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Hip Motor Left -->
+    <link name="hip_motorL">
+      <xacro:inertial_box mass="10.5" x="0.3" y="0.3" z="0.15">
+        <origin xyz="0.15 0 0.075" rpy="0 0 0"/>
+      </xacro:inertial_box>
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+            <mesh filename='file:///$(find otto_simulation)/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
+          </geometry>
+      </visual>
+    </link>
+
+    <!-- Knee Motor Left -->
+    <link name="knee_motorL">
+      <inertial>
+        <origin xyz="0.00 0.0 0.0" rpy="0 0 0"/>
+        <mass value="2e-6"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+            <mesh filename='file:///$(find otto_simulation)/meshes/CyberGearmotor.STL' scale="0.001 0.001 0.001"/>
+          </geometry>
+      </visual>
+    </link>
+
+    <!-- Hip link Left -->
+    <link name="hip_linkL">
+      <inertial>
+        <origin xyz="0.005 0.0 0.0" rpy="0 0 0"/>
+        <mass value="5"/>
+        <inertia ixx="1.1e-9" iyy="1.1e-9" izz="1.1e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
+      </inertial>
+      <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
+          <geometry>
+            <mesh filename='file:///$(find otto_simulation)/meshes/link1.STL' scale="0.001 0.001 0.001"/>
+          </geometry>
+      </visual>
+    </link> 
+
+    <joint name="hip_jointL" type="revolute">
+      <parent link="base_link"/>
+      <child link="hip_motorL"/>
+        <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.26 0.0"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit 
+        lower="-3.1459" 
+        upper="3.1459" 
+        velocity="1000.0" 
+        effort="1000.0"/>
+    </joint>
+
+    <joint name="hip_motorL_to_knee_motorL" type="fixed">
+      <parent link="hip_motorL"/>
+      <child link="knee_motorL"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.05 0.0"/>
+    </joint>
+
+    <joint name="hip_motorL_to_hip_linkL" type="fixed">
+      <parent link="knee_motorL"/>
+      <child link="hip_linkL"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.035 0.0"/>
+    </joint>
+
+</robot>

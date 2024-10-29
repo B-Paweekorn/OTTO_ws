@@ -24,6 +24,8 @@
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz/display.rviz
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/otto-simulation.xacro
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/gazebo.xacro
+/home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/otto-simulation-test.xacro
+/home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/inertial_macros.xacro
 /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/package_run_dependencies/otto_simulation
 /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/parent_prefix_path/otto_simulation
 /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.sh

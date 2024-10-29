@@ -1,0 +1,63 @@
+[0.013s] Invoking command in '/home/chawre/OTTO_ws/build/otto_simulation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --build /home/chawre/OTTO_ws/build/otto_simulation -- -j16 -l16
+[0.052s] [100%] Built target cpp_node_test
+[0.056s] [100%] Built target ament_cmake_python_copy_otto_simulation
+[0.265s] running egg_info
+[0.266s] writing otto_simulation.egg-info/PKG-INFO
+[0.266s] writing dependency_links to otto_simulation.egg-info/dependency_links.txt
+[0.266s] writing top-level names to otto_simulation.egg-info/top_level.txt
+[0.268s] reading manifest file 'otto_simulation.egg-info/SOURCES.txt'
+[0.268s] writing manifest file 'otto_simulation.egg-info/SOURCES.txt'
+[0.292s] [100%] Built target ament_cmake_python_build_otto_simulation_egg
+[0.301s] Invoked command in '/home/chawre/OTTO_ws/build/otto_simulation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --build /home/chawre/OTTO_ws/build/otto_simulation -- -j16 -l16
+[0.331s] Invoking command in '/home/chawre/OTTO_ws/build/otto_simulation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --install /home/chawre/OTTO_ws/build/otto_simulation
+[0.336s] -- Install configuration: ""
+[0.336s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/pythonpath.sh
+[0.336s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/pythonpath.dsv
+[0.336s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info
+[0.336s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/top_level.txt
+[0.336s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/SOURCES.txt
+[0.336s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/PKG-INFO
+[0.336s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation-0.0.0-py3.10.egg-info/dependency_links.txt
+[0.336s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation
+[0.336s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation/__init__.py
+[0.337s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation/dummy_module.py
+[0.365s] Listing '/home/chawre/OTTO_ws/install/otto_simulation/local/lib/python3.10/dist-packages/otto_simulation'...
+[0.368s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/dummy_script.py
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/lib/otto_simulation/cpp_node_test
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/config
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/config/joints_controller.yaml
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_gazebo.launch.py
+[0.370s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_description.launch.py
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/launch/otto_display.launch.py
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/CyberGearmotor.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link2R.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/ODriveBotwheel.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link4.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link1R.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link1.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/Body.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link2.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/meshes/link4R.STL
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/rviz/display.rviz
+[0.371s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf
+[0.371s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/otto-simulation.xacro
+[0.373s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/urdf/gazebo.xacro
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/package_run_dependencies/otto_simulation
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/parent_prefix_path/otto_simulation
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.sh
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/ament_prefix_path.dsv
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/path.sh
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/environment/path.dsv
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.bash
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.sh
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.zsh
+[0.374s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/local_setup.dsv
+[0.374s] -- Installing: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/package.dsv
+[0.375s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/ament_index/resource_index/packages/otto_simulation
+[0.375s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/cmake/otto_simulationConfig.cmake
+[0.375s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/cmake/otto_simulationConfig-version.cmake
+[0.375s] -- Up-to-date: /home/chawre/OTTO_ws/install/otto_simulation/share/otto_simulation/package.xml
+[0.387s] Invoked command in '/home/chawre/OTTO_ws/build/otto_simulation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chawre/Self-Balancing-Robot/ros2_ws/install/controllers:/home/chawre/Self-Balancing-Robot/ros2_ws/install/tf_transformations:/home/chawre/Self-Balancing-Robot/ros2_ws/install/state_estimation:/home/chawre/Self-Balancing-Robot/ros2_ws/install/driver_imu:/opt/ros/humble /usr/bin/cmake --install /home/chawre/OTTO_ws/build/otto_simulation

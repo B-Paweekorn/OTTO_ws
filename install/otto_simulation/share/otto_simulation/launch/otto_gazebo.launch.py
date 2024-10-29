@@ -33,7 +33,8 @@ def generate_launch_description():
                     "gazebo.launch.py"
                 )
             ]
-        )
+        ),
+        # launch_arguments={'pause': 'true'}.items()
     )
     spawn_entity = Node(
         package="gazebo_ros",
