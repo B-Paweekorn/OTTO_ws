@@ -23,25 +23,34 @@ def generate_launch_description():
             os.path.join(pkg, "launch", "otto_description.launch.py")
         )
     )
+    world_file = os.path.join(
+        '/home/chawre/OTTO_ws/src/otto_simulation/world', 'otto.urdf'
+    )
+
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [
-                os.path.join(
-                    get_package_share_directory("gazebo_ros"),
-                    "launch",
-                    "gazebo.launch.py"
-                )
-            ]
+            os.path.join(
+                get_package_share_directory('gazebo_ros'),
+                'launch',
+                'gazebo.launch.py'
+            )
         ),
-        # launch_arguments={'pause': 'true'}.items()
+        launch_arguments={
+            'world': world_file,
+            'pause': 'true'
+        }.items()
     )
+
     spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
             "-topic", "robot_description",
-            "-entity", "otto"
+            "-entity", "otto",
+            "-x", "0.0",
+            "-y", "0.0",   
+            "-z", "0.4" 
         ],
         output = "screen"
     )
@@ -69,7 +78,7 @@ def generate_launch_description():
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
     launch_description.add_action(joint_state_broadcaster_spawner)
-    launch_description.add_action(robot_controller_spawner)
+    # launch_description.add_action(robot_controller_spawner)
     launch_description.add_action(forward_position_controller_spawner)
     launch_description.add_action(gazebo)
     launch_description.add_action(spawn_entity)

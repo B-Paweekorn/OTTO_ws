@@ -3,25 +3,24 @@
     <!-- Declare PI -->
     <xacro:property name="PI" value="3.14159265359"/>
     <xacro:include filename="gazebo.xacro"/>
-    <xacro:include filename="inertial_macros.xacro"/>
 
-    <link name="world"></link>
+    <!-- <link name="world"></link>
 
     <joint name="base_joint" type="fixed">
-      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
       <parent link="world"/>
       <child link="base_link"/>        
-    </joint>
+    </joint> -->
 
     <!-- Base Link -->
     <link name="base_link">
-        <inertial>
+        <!-- <inertial>
           <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
           <mass value="5.21707"/>
           <inertia ixx="25.36345483" ixy="0.0" ixz="-2.72079904"
                    iyx="0.0" iyy="28.97825187" iyz="0.0"
                    izx="-2.72079904" izy="0.0" izz="35.16013094" />
-        </inertial>
+        </inertial> -->
         
         <visual>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
@@ -154,6 +153,7 @@
       <child link="hip_motorL"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <joint name="hip_motorL_to_knee_motorL" type="fixed">
@@ -173,6 +173,7 @@
       <child link="knee_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="continuous">
@@ -180,6 +181,7 @@
       <child link="leg_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -187,6 +189,7 @@
       <child link="wheel_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <!-- Right Side -->
@@ -306,6 +309,7 @@
       <child link="hip_motorR"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 -0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
+        <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
 
@@ -326,6 +330,7 @@
       <child link="knee_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.05 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="continuous">
@@ -333,6 +338,7 @@
       <child link="leg_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">
@@ -340,6 +346,7 @@
       <child link="wheel_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 -0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
+      <dynamics damping="0.1" friction="0.05"/>
     </joint>
 
 </robot>
