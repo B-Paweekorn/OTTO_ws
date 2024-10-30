@@ -24,7 +24,7 @@ def generate_launch_description():
         )
     )
     world_file = os.path.join(
-        '/home/chawre/OTTO_ws/src/otto_simulation/world', 'otto.urdf'
+        '/home/chawre/OTTO_ws/src/otto_simulation/world', 'otto.xacro'
     )
 
 
@@ -79,7 +79,7 @@ def generate_launch_description():
     launch_description.add_action(robot)
     launch_description.add_action(joint_state_broadcaster_spawner)
     # launch_description.add_action(robot_controller_spawner)
-    launch_description.add_action(forward_position_controller_spawner)
+    # launch_description.add_action(forward_position_controller_spawner)
     launch_description.add_action(gazebo)
     launch_description.add_action(spawn_entity)
     return launch_description
