@@ -1,3 +1,93 @@
 controller_manager:
   ros__parameters:
-    update_rate: 100  # Update rate in Hz
+    update_rate: 100
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+hip_jointL_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "hip_jointL"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+knee_jointL_effort_controller:
+  type: "effort_controllers/JointPositionController
+  joint: "knee_jointL"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+virtualhip_jointL_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "virtualhip_jointL"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+wheel_jointL_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "wheel_jointL"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+hip_jointR_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "hip_jointR"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+knee_jointR_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "knee_jointR"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+virtualhip_jointR_effort_controller:
+  type: "effort_controllers/JointPositionController"
+  joint: "virtualhip_jointR"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
+
+wheel_jointR_effort_controller:
+  type: "effort_controllers/JointPositionController
+  joint: "wheel_jointR"
+  pid:
+    p: 100.0
+    i: 0.01
+    d: 10.0
+    i_clamp_min: -10.0
+    i_clamp_max: 10.0
+    antiwindup: true
