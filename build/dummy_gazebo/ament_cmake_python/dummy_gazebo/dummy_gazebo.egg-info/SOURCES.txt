@@ -1,7 +1,0 @@
-setup.py
-dummy_gazebo/__init__.py
-dummy_gazebo/dummy_module.py
-dummy_gazebo.egg-info/PKG-INFO
-dummy_gazebo.egg-info/SOURCES.txt
-dummy_gazebo.egg-info/dependency_links.txt
-dummy_gazebo.egg-info/top_level.txt

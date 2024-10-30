@@ -1,7 +1,0 @@
-setup.py
-rbt_simulation/__init__.py
-rbt_simulation/dummy_module.py
-rbt_simulation.egg-info/PKG-INFO
-rbt_simulation.egg-info/SOURCES.txt
-rbt_simulation.egg-info/dependency_links.txt
-rbt_simulation.egg-info/top_level.txt
