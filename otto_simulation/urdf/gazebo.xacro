@@ -6,125 +6,101 @@
         </plugin>
     </gazebo>
 
-    <!-- <ros2_control name="GazeboSystem" type="system">
+    <ros2_control name="GazeboSystem" type="system">
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
         <joint name="hip_jointL">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="knee_jointL">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointL">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="wheel_jointL">
-            <param name="vel_kp">10</param>
-            <param name="vel_ki">5</param>
-            <param name="vel_kd">2</param>
-            <param name="vel_max_integral_error">10000</param>
-       
-            <command_interface name="velocity_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
 
 
         <joint name="hip_jointR">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="knee_jointR">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointR">
-            <param name="pos_kp">10</param>
-            <param name="pos_ki">1</param>
-            <param name="pos_kd">2</param>
-            <param name="pos_max_integral_error">10000</param>
-       
-            <command_interface name="position_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
         <joint name="wheel_jointR">
-            <param name="vel_kp">10</param>
-            <param name="vel_ki">5</param>
-            <param name="vel_kd">2</param>
-            <param name="vel_max_integral_error">10000</param>
-       
-            <command_interface name="velocity_pid"/>
-       
-            <state_interface name="position">
-              <param name="initial_value">0.0</param>
-            </state_interface>
-            <state_interface name="velocity"/>
-            <state_interface name="effort"/>
+            <command_interface name="effort">
+                <param name="min">-10000</param>
+                <param name="max">10000</param>
+              </command_interface>
+              <state_interface name="position">
+                <param name="initial_value">0.0</param>
+              </state_interface>
+              <state_interface name="velocity"/>
+              <state_interface name="effort"/>
         </joint>
-    </ros2_control> -->
+    </ros2_control>
 
     <gazebo reference="base_link">
         <mu1>1.0</mu1>

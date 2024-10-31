@@ -5,28 +5,40 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-#     effort_controller:
-#       type: effort_controllers/JointGroupEffortController
+    effort_controller:
+      type: effort_controllers/JointGroupEffortController
     
-#     velocity_controller:
-#       type: velocity_controllers/JointGroupVelocityController
+    velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
     
-#     position_controller:
-#       type: position_controllers/JointGroupPositionController
+    position_controller:
+      type: position_controllers/JointGroupPositionController
 
-# velocity_controllers:
-#   ros__parameters:
-#     joints: 
-#       - wheel_jointL
-#       - wheel_jointR
+effort_controller:
+  ros__parameters:
+    joints: 
+      - wheel_jointL
+      - wheel_jointR
+      - hip_jointL
+      - knee_jointL
+      - virtualhip_jointL
+      - hip_jointR
+      - knee_jointR
+      - virtualhip_jointR
 
-# position_controller:
-#   ros__parameters:
-#     joints:
-#       - hip_jointL
-#       - knee_jointL
-#       - virtualhip_jointL
-#       - hip_jointR
-#       - knee_jointR
-#       - virtualhip_jointR
+velocity_controller:
+  ros__parameters:
+    joints: 
+      - wheel_jointL
+      - wheel_jointR
+
+position_controller:
+  ros__parameters:
+    joints:
+      - hip_jointL
+      - knee_jointL
+      - virtualhip_jointL
+      - hip_jointR
+      - knee_jointR
+      - virtualhip_jointR
 
