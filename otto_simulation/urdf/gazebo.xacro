@@ -1,114 +1,130 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="otto">
-
-    <gazebo>
-        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-            <joint_name>hip_jointL</joint_name>
-            <joint_name>knee_jointL</joint_name>
-            <joint_name>virtualhip_jointL</joint_name>
-            <joint_name>wheel_jointL</joint_name>
-
-            <joint_name>hip_jointR</joint_name>
-            <joint_name>knee_jointR</joint_name>
-            <joint_name>virtualhip_jointR</joint_name>
-            <joint_name>wheel_jointR</joint_name>
-            <update_rate>30</update_rate>
-        </plugin>
-    </gazebo>
-
     <gazebo>
         <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
             <parameters>$(find otto_simulation)/config/joints_controller.yaml</parameters>
         </plugin>
     </gazebo>
 
-    <transmission name="tran1">
-        <type>transmission_interface/SimpleTransmission</type>
+    <!-- <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
         <joint name="hip_jointL">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr1">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran2">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="knee_jointL">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr2">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran3">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="virtualhip_jointL">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr3">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran4">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="wheel_jointL">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="vel_kp">10</param>
+            <param name="vel_ki">5</param>
+            <param name="vel_kd">2</param>
+            <param name="vel_max_integral_error">10000</param>
+       
+            <command_interface name="velocity_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr4">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
 
-    <transmission name="tran5">
-        <type>transmission_interface/SimpleTransmission</type>
+
         <joint name="hip_jointR">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr5">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran6">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="knee_jointR">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr6">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran7">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="virtualhip_jointR">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="pos_kp">10</param>
+            <param name="pos_ki">1</param>
+            <param name="pos_kd">2</param>
+            <param name="pos_max_integral_error">10000</param>
+       
+            <command_interface name="position_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr7">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran8">
-        <type>transmission_interface/SimpleTransmission</type>
         <joint name="wheel_jointR">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <param name="vel_kp">10</param>
+            <param name="vel_ki">5</param>
+            <param name="vel_kd">2</param>
+            <param name="vel_max_integral_error">10000</param>
+       
+            <command_interface name="velocity_pid"/>
+       
+            <state_interface name="position">
+              <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
         </joint>
-        <actuator name="actr8">
-          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-          <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
+    </ros2_control> -->
 
     <gazebo reference="base_link">
         <mu1>1.0</mu1>
@@ -116,6 +132,7 @@
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>
+        <material>Gazebo/Green</material>
     </gazebo>
 
     <gazebo reference="hip_motorL">

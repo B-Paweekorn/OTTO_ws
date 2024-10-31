@@ -4,90 +4,29 @@ controller_manager:
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
-hip_jointL_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "hip_jointL"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
 
-knee_jointL_effort_controller:
-  type: "effort_controllers/JointPositionController
-  joint: "knee_jointL"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
+#     effort_controller:
+#       type: effort_controllers/JointGroupEffortController
+    
+#     velocity_controller:
+#       type: velocity_controllers/JointGroupVelocityController
+    
+#     position_controller:
+#       type: position_controllers/JointGroupPositionController
 
-virtualhip_jointL_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "virtualhip_jointL"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
+# velocity_controllers:
+#   ros__parameters:
+#     joints: 
+#       - wheel_jointL
+#       - wheel_jointR
 
-wheel_jointL_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "wheel_jointL"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
+# position_controller:
+#   ros__parameters:
+#     joints:
+#       - hip_jointL
+#       - knee_jointL
+#       - virtualhip_jointL
+#       - hip_jointR
+#       - knee_jointR
+#       - virtualhip_jointR
 
-hip_jointR_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "hip_jointR"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
-
-knee_jointR_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "knee_jointR"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
-
-virtualhip_jointR_effort_controller:
-  type: "effort_controllers/JointPositionController"
-  joint: "virtualhip_jointR"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true
-
-wheel_jointR_effort_controller:
-  type: "effort_controllers/JointPositionController
-  joint: "wheel_jointR"
-  pid:
-    p: 100.0
-    i: 0.01
-    d: 10.0
-    i_clamp_min: -10.0
-    i_clamp_max: 10.0
-    antiwindup: true

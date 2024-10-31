@@ -36,12 +36,11 @@ def generate_launch_description():
                 'gazebo.launch.py'
             )
         ),
-        # launch_arguments={
-        #     'world': world_file,
-        #     'pause': 'true'
-        # }.items()
+        launch_arguments={
+            'world': world_file,
+            'pause': 'true'
+        }.items()
     )
-
 
     spawn_entity = Node(
         package="gazebo_ros",
@@ -56,11 +55,6 @@ def generate_launch_description():
         output = "screen"
     )
 
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher'
-    )
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -83,8 +77,7 @@ def generate_launch_description():
     
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
-    # launch_description.add_action(joint_state_broadcaster_spawner)
-    # launch_description.add_action(joint_state_publisher_node)
+    launch_description.add_action(joint_state_broadcaster_spawner)
     # launch_description.add_action(robot_controller_spawner)
     # launch_description.add_action(forward_position_controller_spawner)
     launch_description.add_action(gazebo)
