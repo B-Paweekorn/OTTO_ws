@@ -3,41 +3,90 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
+import signal
 
 class Controller(Node):
     def __init__(self):
-        super().__init__('setpoint_to_effort_node')
-        self.create_subscription(Float64MultiArray,'/setpoint',self.setpoint_callback,10)
+        super().__init__('x_des_to_effort_node')
+        self.create_subscription(Float64MultiArray,'/x_des',self.x_des_callback,10)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
 
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
-        # HL, KL, VHL, WL, HR, KR, VHR, WR
-        self.setpoint = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.joint_state = []
+        self.timer = self.create_timer(0.001, self.timer_callback)
 
+        # HL, KL, VHL, WL, HR, KR, VHR, WR
+        self.x_des = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.joint_state = {}
+
+        self.ctrl_input = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    def timer_callback(self):
+        for i, joint_name in enumerate(self.joint_state["names"]):
+            # pos ctrl
+            if joint_name != "wheel_jointL" and joint_name != "wheel_jointR":
+                pos_err = self.x_des[i] - self.joint_state["q"][i]
+                self.ctrl_input[i] = pos_err * 10.0 # + self.joint_state["qd"][i] * 2
+            # vel ctrl replace with lqr
+            else:
+                self.ctrl_input[i] = 0.0
+        
+        print("state: ", self.joint_state["q"])
+        print("ctrl_input: ",self.ctrl_input)
+        effort_msg = Float64MultiArray()
+        effort_msg.data = self.ctrl_input
+        self.effort_publisher.publish(effort_msg)
 
     def feedback_callback(self, msg):
         joint_names = msg.name
-        feedback_positions = msg.position
-        feedback_velocities = msg.velocity
+        feedback_q = msg.position
+        feedback_qd = msg.velocity
         feedback_efforts = msg.effort
-        
-        self.joint_states = {
-            'names': joint_names,
-            'positions': feedback_positions,
-            'velocities': feedback_velocities,
-            'efforts': feedback_efforts
+
+        desired_order = [
+            'hip_jointL', 'knee_jointL', 'virtualhip_jointL', 'wheel_jointL',
+            'hip_jointR', 'knee_jointR', 'virtualhip_jointR', 'wheel_jointR'
+        ]
+
+        joint_data = {
+            name: (q, qd, effort)
+            for name, q, qd, effort in zip(joint_names, feedback_q, feedback_qd, feedback_efforts)
+        }
+
+        self.joint_state = {
+            'names': desired_order,
+            'q': [joint_data[joint][0] for joint in desired_order],
+            'qd': [joint_data[joint][1] for joint in desired_order],
+            'efforts': [joint_data[joint][2] for joint in desired_order]
         }
                 
-    def setpoint_callback(self, msg):
-        self.setpoint = msg.data
-        
+    def x_des_callback(self, msg):
+        self.x_des = msg.data
+    
+
+    def stop_robot(self):
+        self.ctrl_input = [0.0] * 8
+        zero_effort_msg = Float64MultiArray()
+        zero_effort_msg.data = self.ctrl_input
+        self.effort_publisher.publish(zero_effort_msg)
+        print("Robot stopped with zero effort.")
+
+    def destroy_node(self):
+        self.stop_robot()
+        super().destroy_node()
+
 def main(args=None):
     rclpy.init(args=args)
     node = Controller()
+
+    # Handle graceful shutdown on Ctrl+C
+    def signal_handler(sig, frame):
+        print("Caught SIGINT, stopping the robot...")
+        node.destroy_node()
+        rclpy.shutdown()
+        
+    signal.signal(signal.SIGINT, signal_handler)
     rclpy.spin(node)
-    node.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
