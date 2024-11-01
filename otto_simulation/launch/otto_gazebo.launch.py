@@ -61,16 +61,10 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    robot_controller_spawner = Node(
+    effort_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["effort_controller", "--controller-manager", "/controller_manager"],
-    )
-
-    forward_position_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["forward_position_controller", "--controller-manager", "/controller_manager"],
     )
 
     launch_description = LaunchDescription()
@@ -78,7 +72,7 @@ def generate_launch_description():
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
     launch_description.add_action(joint_state_broadcaster_spawner)
-    launch_description.add_action(robot_controller_spawner)
+    launch_description.add_action(effort_controller_spawner)
     # launch_description.add_action(forward_position_controller_spawner)
     launch_description.add_action(gazebo)
     launch_description.add_action(spawn_entity)
