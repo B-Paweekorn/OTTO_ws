@@ -13,7 +13,8 @@ class Controller(Node):
 
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
-        self.timer = self.create_timer(0.002, self.timer_callback)
+        self.dt = 0.002
+        self.timer = self.create_timer(self.dt, self.timer_callback)
 
         # HL, KL, VHL, WL, HR, KR, VHR, WR
         self.x_des = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -22,16 +23,26 @@ class Controller(Node):
 
         self.kp = [8.4, 12.0, 12.0, 0, 8.4, 12.0, 12.0, 0]
         self.kd = [0.1, 0.1, 0.5, 0, 0.1, 0.1, 0.5, 0]
+        self.ki = [1, 1, 1, 0, 1, 1, 1, 0]
+        self.integral_error = [0.0] * 8
+        self.integral_limit = 10.0
+
     def timer_callback(self):
         for i, joint_name in enumerate(self.joint_state["names"]):
             # pos ctrl
             if joint_name != "wheel_jointL" and joint_name != "wheel_jointR":
                 pos_err = self.x_des[i] - self.joint_state["q"][i]
-                self.ctrl_input[i] = pos_err * self.kp[i] - self.joint_state["qd"][i] * self.kd[i]
-            # vel ctrl replace with lqr
+                self.integral_error[i] += pos_err * self.dt
+                self.integral_error[i] = max(min(self.integral_error[i], self.integral_limit), -self.integral_limit)
+                
+                p_term = pos_err * self.kp[i]
+                i_term = self.integral_error[i] * self.ki[i]
+                d_term = -self.joint_state["qd"][i] * self.kd[i]
+                
+                self.ctrl_input[i] = p_term + i_term + d_term
             else:
                 self.ctrl_input[i] = 0.0
-    # Print with 4 decimal precision
+
         state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
         state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
         ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
