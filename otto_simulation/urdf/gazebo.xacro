@@ -103,8 +103,6 @@
     </ros2_control>
 
     <gazebo reference="base_link">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>

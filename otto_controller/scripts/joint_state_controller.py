@@ -13,26 +13,32 @@ class Controller(Node):
 
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
-        self.timer = self.create_timer(0.001, self.timer_callback)
+        self.timer = self.create_timer(0.002, self.timer_callback)
 
         # HL, KL, VHL, WL, HR, KR, VHR, WR
         self.x_des = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.joint_state = {}
-
         self.ctrl_input = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+        self.kp = [8.4, 12.0, 12.0, 0, 8.4, 12.0, 12.0, 0]
+        self.kd = [0.1, 0.1, 0.5, 0, 0.1, 0.1, 0.5, 0]
     def timer_callback(self):
         for i, joint_name in enumerate(self.joint_state["names"]):
             # pos ctrl
             if joint_name != "wheel_jointL" and joint_name != "wheel_jointR":
                 pos_err = self.x_des[i] - self.joint_state["q"][i]
-                self.ctrl_input[i] = pos_err * 10.0 # + self.joint_state["qd"][i] * 2
+                self.ctrl_input[i] = pos_err * self.kp[i] - self.joint_state["qd"][i] * self.kd[i]
             # vel ctrl replace with lqr
             else:
                 self.ctrl_input[i] = 0.0
-        
-        print("state: ", self.joint_state["q"])
-        print("ctrl_input: ",self.ctrl_input)
+    # Print with 4 decimal precision
+        state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
+        state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
+        ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
+
+        print("stateq: ", state_q_str)
+        print("stateqd: ", state_qd_str)
+        print("ctrl_input: ", ctrl_input_str)
         effort_msg = Float64MultiArray()
         effort_msg.data = self.ctrl_input
         self.effort_publisher.publish(effort_msg)
@@ -84,7 +90,7 @@ def main(args=None):
         print("Caught SIGINT, stopping the robot...")
         node.destroy_node()
         rclpy.shutdown()
-        
+
     signal.signal(signal.SIGINT, signal_handler)
     rclpy.spin(node)
     rclpy.shutdown()

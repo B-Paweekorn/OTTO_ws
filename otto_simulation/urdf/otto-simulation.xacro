@@ -4,13 +4,13 @@
     <xacro:property name="PI" value="3.14159265359"/>
     <xacro:include filename="gazebo.xacro"/>
 
-    <link name="world"></link>
+    <!-- <link name="world"></link>
 
     <joint name="base_joint" type="fixed">
       <origin xyz="0.0 0.0 0.5" rpy="0.0 0.0 0.0"/>
       <parent link="world"/>
       <child link="base_link"/>        
-    </joint>
+    </joint> -->
 
     <!-- Base Link -->
     <link name="base_link">
@@ -32,7 +32,7 @@
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
-                <box size="0.20 0.19 0.15"/> 
+                <box size="0.22 0.19 0.15"/> 
             </geometry>
         </collision>
     </link>
@@ -117,6 +117,13 @@
             <mesh filename='file:///$(find otto_simulation)/meshes/link4.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="-0.05656 0.00 0.05656"/>
+        <geometry>
+            <sphere radius="0.01"/>
+        </geometry>
+      </collision>
+
     </link> 
 
     <!-- wheel link Left -->
@@ -144,12 +151,12 @@
       
     </link> 
 
-    <joint name="hip_jointL" type="continuous">
+    <joint name="hip_jointL" type="revolute">
       <parent link="base_link"/>
       <child link="hip_motorL"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.05"/>
+      <dynamics damping="0.2" friction="0.05"/>
       <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
     </joint>
 
@@ -165,16 +172,16 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.035 0.0"/>
     </joint>
 
-    <joint name="knee_jointL" type="continuous">
+    <joint name="knee_jointL" type="revolute">
       <parent link="knee_motorL"/>
       <child link="knee_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.05"/>
+      <dynamics damping="0.1" friction="0.02"/>
       <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
     </joint>
 
-    <joint name="virtualhip_jointL" type="continuous">
+    <joint name="virtualhip_jointL" type="revolute">
       <parent link="knee_linkL"/>
       <child link="leg_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
@@ -274,6 +281,12 @@
             <mesh filename='file:///$(find otto_simulation)/meshes/link4R.STL' scale="0.001 0.001 0.001"/>
           </geometry>
       </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="-0.05656 0.00 0.05656"/>
+        <geometry>
+            <sphere radius="0.01"/>
+        </geometry>
+      </collision>
     </link> 
 
     <!-- wheel link Right -->
@@ -300,12 +313,12 @@
       </collision>
     </link> 
 
-    <joint name="hip_jointR" type="continuous">
+    <joint name="hip_jointR" type="revolute">
       <parent link="base_link"/>
       <child link="hip_motorR"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 -0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <dynamics damping="0.1" friction="0.05"/>
+        <dynamics damping="0.2" friction="0.05"/>
         <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
     </joint>
 
@@ -322,16 +335,16 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.035 0.0"/>
     </joint>
 
-    <joint name="knee_jointR" type="continuous">
+    <joint name="knee_jointR" type="revolute">
       <parent link="knee_motorR"/>
       <child link="knee_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.05 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.05"/>
+      <dynamics damping="0.1" friction="0.02"/>
       <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
     </joint>
 
-    <joint name="virtualhip_jointR" type="continuous">
+    <joint name="virtualhip_jointR" type="revolute">
       <parent link="knee_linkR"/>
       <child link="leg_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
