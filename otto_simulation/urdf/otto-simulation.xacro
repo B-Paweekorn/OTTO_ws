@@ -37,6 +37,23 @@
         </collision>
     </link>
 
+
+
+    <joint name="imu_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <parent link="base_link"/>
+      <child link="imu_link"/>
+    </joint>
+
+    <!-- Camera -->
+    <link name="imu_link">
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
     <!-- Hip Motor Left -->
     <link name="hip_motorL">
       <inertial>
@@ -157,7 +174,7 @@
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.2" friction="0.05"/>
-      <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
+      <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="hip_motorL_to_knee_motorL" type="fixed">
@@ -178,7 +195,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.02"/>
-      <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
+      <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="revolute">
@@ -187,7 +204,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.05"/>
-      <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
+      <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -319,8 +336,8 @@
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 -0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
         <dynamics damping="0.2" friction="0.05"/>
-        <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
-    </joint>
+        <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      </joint>
 
 
     <joint name="hip_motorR_to_knee_motorR" type="fixed">
@@ -341,7 +358,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.05 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.02"/>
-      <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
+      <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="revolute">
@@ -350,7 +367,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.05"/>
-      <limit effort="100.0" lower="${PI}" upper="${-PI}" velocity="30"/>
+      <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">
@@ -362,4 +379,24 @@
       <limit effort="100.0" velocity="30"/>
     </joint>
 
+    <gazebo reference="imu_link">
+      <gravity>true</gravity>
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>1000</update_rate>
+        <visualize>true</visualize>
+        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+          <topicName>otto_imu</topicName>
+          <bodyName>imu_link</bodyName>
+          <updateRateHZ>1000.0</updateRateHZ>
+          <gaussianNoise>0.0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 0</rpyOffset>
+          <frameName>imu_link</frameName>
+          <initialOrientationAsReference>false</initialOrientationAsReference>
+        </plugin>
+        <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo>
+  
 </robot>
