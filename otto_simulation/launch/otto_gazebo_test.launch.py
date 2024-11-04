@@ -21,7 +21,7 @@ def generate_launch_description():
         
     robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg, "launch", "otto_description.launch.py")
+            os.path.join(pkg, "launch", "otto_description_test.launch.py")
         )
     )
 

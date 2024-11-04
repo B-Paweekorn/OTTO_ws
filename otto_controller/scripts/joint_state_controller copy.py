@@ -21,7 +21,7 @@ class Controller(Node):
         # HL, KL, VHL, WL, HR, KR, VHR, WR
         self.x_des = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.joint_state = {}
-        self.ctrl_input = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.ctrl_input = [0.0, 0.0]
 
         self.kp = [8.4, 12.0, 12.0, 0, 8.4, 12.0, 12.0, 0]
         self.kd = [0.1, 0.1, 0.5, 0, 0.1, 0.1, 0.5, 0]
@@ -32,32 +32,47 @@ class Controller(Node):
         self.imu_angle = None
         self.gyro = [0.0, 0.0, 0.0]
         self.accel = [0.0, 0.0, 0.0]
+        self.e_i = 0
     def timer_callback(self):
-        for i, joint_name in enumerate(self.joint_state["names"]):
-            # pos ctrl
-            if joint_name != "wheel_jointL" and joint_name != "wheel_jointR":
-                pos_err = self.x_des[i] - self.joint_state["q"][i]
-                self.integral_error[i] += pos_err * self.dt
-                self.integral_error[i] = max(min(self.integral_error[i], self.integral_limit), -self.integral_limit)
-                
-                p_term = pos_err * self.kp[i]
-                i_term = self.integral_error[i] * self.ki[i]
-                d_term = -self.joint_state["qd"][i] * self.kd[i]
-                
-                self.ctrl_input[i] = p_term + i_term + d_term
-            else:
-                self.ctrl_input[i] = self.imu_angle[1] * 1.50 # + self.gyro[1] * -0.2
+        try:
+            imu = self.imu_angle[1]
+            for i in range(0,2):
+                self.e_i += imu * self.dt
+                self.ctrl_input[i] =imu * 100 + self.joint_state["qd"][i] * -0.3 + self.gyro[1] * 5 + self.joint_state["qd"][i] * 1  # self.joint_state["q"][i] * 0.0001
+                if self.ctrl_input[i] > 10:
+                    self.ctrl_input[i] = 10.0
+                elif self.ctrl_input[i] < -10:
+                    self.ctrl_input[i] = -10.0
 
-        state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
-        state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
-        ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
+                print(self.ctrl_input, imu)
+            state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
+            state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
+            ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
 
-        # print("stateq: ", state_q_str)
-        # print("stateqd: ", state_qd_str)
-        # print("ctrl_input: ", ctrl_input_str)
-        effort_msg = Float64MultiArray()
-        effort_msg.data = self.ctrl_input
-        self.effort_publisher.publish(effort_msg)
+            # print("stateq: ", state_q_str)
+            # print("stateqd: ", state_qd_str)
+            # print("ctrl_input: ", ctrl_input_str)
+            effort_msg = Float64MultiArray()
+            effort_msg.data = self.ctrl_input
+            self.effort_publisher.publish(effort_msg)
+        except (TypeError, IndexError, KeyError) as e:
+            self.get_logger().error(f"Error updating control input: {e}")
+    def input_handler(self):
+        while True:
+            user_input = input("Enter 'kp' or 'kd' followed by the value (e.g., 'kp 100'): ").strip()
+            try:
+                param, value = user_input.split()
+                value = float(value)
+                if param.lower() == 'kp':
+                    self.kp = value
+                    self.get_logger().info(f'Kp set to {self.kp}')
+                elif param.lower() == 'kd':
+                    self.kd = value
+                    self.get_logger().info(f'Kd set to {self.kd}')
+                else:
+                    self.get_logger().info("Invalid input. Use 'kp' or 'kd' followed by the value.")
+            except ValueError:
+                self.get_logger().info("Invalid input format. Please use 'kp 100' or 'kd 10'.")
 
     def feedback_callback(self, msg):
         joint_names = msg.name
@@ -66,8 +81,8 @@ class Controller(Node):
         feedback_efforts = msg.effort
 
         desired_order = [
-            'hip_jointL', 'knee_jointL', 'virtualhip_jointL', 'wheel_jointL',
-            'hip_jointR', 'knee_jointR', 'virtualhip_jointR', 'wheel_jointR'
+            'wheel_jointL',
+            'wheel_jointR'
         ]
 
         joint_data = {
@@ -95,7 +110,6 @@ class Controller(Node):
         ]
         
         self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
-        print(self.imu_angle)
         self.gyro[0] = msg.angular_velocity.x
         self.gyro[1] = msg.angular_velocity.y
         self.gyro[2] = msg.angular_velocity.z
@@ -105,7 +119,7 @@ class Controller(Node):
         self.accel[2] = msg.linear_acceleration.z
 
     def stop_robot(self):
-        self.ctrl_input = [0.0] * 8
+        self.ctrl_input = [0.0] * 2
         zero_effort_msg = Float64MultiArray()
         zero_effort_msg.data = self.ctrl_input
         self.effort_publisher.publish(zero_effort_msg)
