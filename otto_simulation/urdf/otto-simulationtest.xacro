@@ -15,11 +15,11 @@
     <!-- Base Link -->
     <link name="base_link">
         <inertial>
-          <origin xyz="-0.025374 0.0 0.0" rpy="0 0 0"/>
-          <mass value="5.21707"/>
-          <inertia ixx="25.36345483e-3" ixy="0.0" ixz="-2.72079904e-3"
-                   iyx="0.0" iyy="28.97825187e-3" iyz="0.0"
-                   izx="-2.72079904e-3" izy="0.0" izz="35.16013094e-3" />
+          <origin xyz="-0.02195199 0.0 0.0" rpy="0 0 0"/>
+          <mass value="3.00"/>
+          <inertia ixx="14584893e-9" ixy="0.0" ixz="0.0"
+                   iyx="0.0" iyy="16663530e-9" iyz="0.0"
+                   izx="0.0" izy="0.0" izz="20218332e-9" />
         </inertial>
         
         <visual>
@@ -212,7 +212,7 @@
       <child link="wheel_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
+      <dynamics damping="0.01" friction="0.0"/>
       <limit effort="300.0" velocity="3000"/>
     </joint>
 
@@ -355,7 +355,7 @@
     <joint name="knee_jointR" type="fixed">
       <parent link="knee_motorR"/>
       <child link="knee_linkR"/>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.05 0.0"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.02"/>
       <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/>
@@ -375,7 +375,7 @@
       <child link="wheel_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 -0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
+      <dynamics damping="0.01" friction="0.0"/>
       <limit effort="300.0" velocity="3000"/>
     </joint>
 
@@ -383,12 +383,12 @@
       <gravity>true</gravity>
       <sensor name="imu_sensor" type="imu">
         <always_on>true</always_on>
-        <update_rate>1000</update_rate>
+        <update_rate>500.0</update_rate>
         <visualize>true</visualize>
         <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
           <topicName>otto_imu</topicName>
           <bodyName>imu_link</bodyName>
-          <updateRateHZ>1000.0</updateRateHZ>
+          <updateRateHZ>200.0</updateRateHZ>
           <gaussianNoise>0.0</gaussianNoise>
           <xyzOffset>0 0 0</xyzOffset>
           <rpyOffset>0 0 0</rpyOffset>

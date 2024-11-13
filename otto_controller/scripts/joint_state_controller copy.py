@@ -2,9 +2,12 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import JointState, Imu
 import signal
 import tf_transformations
+
+import numpy as np
 
 class Controller(Node):
     def __init__(self):
@@ -12,10 +15,10 @@ class Controller(Node):
         self.create_subscription(Float64MultiArray,'/x_des',self.x_des_callback,10)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
-
+        self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
-        self.dt = 0.002
+        self.dt = 0.0002
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
         # HL, KL, VHL, WL, HR, KR, VHR, WR
@@ -33,18 +36,40 @@ class Controller(Node):
         self.gyro = [0.0, 0.0, 0.0]
         self.accel = [0.0, 0.0, 0.0]
         self.e_i = 0
+
+        self.vx = 0
+        self.w = 0
+        self.effort_msg = Float64MultiArray()
     def timer_callback(self):
         try:
-            imu = self.imu_angle[1]
-            for i in range(0,2):
-                self.e_i += imu * self.dt
-                self.ctrl_input[i] =imu * 100 + self.joint_state["qd"][i] * -0.3 + self.gyro[1] * 5 + self.joint_state["qd"][i] * 1  # self.joint_state["q"][i] * 0.0001
-                if self.ctrl_input[i] > 10:
-                    self.ctrl_input[i] = 10.0
-                elif self.ctrl_input[i] < -10:
-                    self.ctrl_input[i] = -10.0
+            theta = self.imu_angle[1]
+            dtheta = self.gyro[1]
+            omega = (self.joint_state["qd"][1] - self.joint_state["qd"][0])*0.086/0.22584
+            vx_s = (self.joint_state["qd"][0] + self.joint_state["qd"][1])*0.5*0.086
+            
+            # print(omega)
 
-                print(self.ctrl_input, imu)
+            theta_d = np.arcsin((2*0.01*self.vx/0.086)/(5*0.2828*9.81))
+            ffw = (5*0.2828*9.81*np.sin(theta_d) - 2*0.01*self.vx/0.086)/2
+            self.e_i += (theta_d - theta) * self.dt
+            # print(np.rad2deg(theta_d))
+            tauL = (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s)* -13.9589 + (self.w - omega) * -3.1891
+            tauR = (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s)* -13.9589 + (self.w - omega) * +3.1891
+            self.ctrl_input[0] = ffw + tauL
+            self.ctrl_input[1] = ffw + tauR
+
+            if self.ctrl_input[0] > 2.2:
+                self.ctrl_input[0] = 2.2
+            elif self.ctrl_input[0] < -2.2:
+                self.ctrl_input[0] = -2.2
+            
+            if self.ctrl_input[1] > 2.2:
+                self.ctrl_input[1] = 2.2
+            elif self.ctrl_input[1] < -2.2:
+                self.ctrl_input[1] = -2.2
+
+            print(dtheta)
+            # print(np.rad2deg(theta_d), np.rad2deg(theta))
             state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
             state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
             ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
@@ -52,27 +77,15 @@ class Controller(Node):
             # print("stateq: ", state_q_str)
             # print("stateqd: ", state_qd_str)
             # print("ctrl_input: ", ctrl_input_str)
-            effort_msg = Float64MultiArray()
-            effort_msg.data = self.ctrl_input
-            self.effort_publisher.publish(effort_msg)
+
+            self.effort_msg.data = self.ctrl_input
+            self.effort_publisher.publish(self.effort_msg)
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
-    def input_handler(self):
-        while True:
-            user_input = input("Enter 'kp' or 'kd' followed by the value (e.g., 'kp 100'): ").strip()
-            try:
-                param, value = user_input.split()
-                value = float(value)
-                if param.lower() == 'kp':
-                    self.kp = value
-                    self.get_logger().info(f'Kp set to {self.kp}')
-                elif param.lower() == 'kd':
-                    self.kd = value
-                    self.get_logger().info(f'Kd set to {self.kd}')
-                else:
-                    self.get_logger().info("Invalid input. Use 'kp' or 'kd' followed by the value.")
-            except ValueError:
-                self.get_logger().info("Invalid input format. Please use 'kp 100' or 'kd 10'.")
+
+    def cmd_vel_callback(self, msg):
+        self.vx = msg.linear.x
+        self.w = msg.angular.z
 
     def feedback_callback(self, msg):
         joint_names = msg.name

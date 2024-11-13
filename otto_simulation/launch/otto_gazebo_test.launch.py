@@ -9,9 +9,10 @@ from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
     
 def generate_launch_description():
-    
-    pkg = get_package_share_directory('otto_simulation')
-    rviz_path = os.path.join(pkg,'rviz','display.rviz')
+    ctrl_pkg = get_package_share_directory('otto_controller')
+
+    gz_pkg = get_package_share_directory('otto_simulation')
+    rviz_path = os.path.join(gz_pkg,'rviz','display.rviz')
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -21,7 +22,7 @@ def generate_launch_description():
         
     robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg, "launch", "otto_description_test.launch.py")
+            os.path.join(gz_pkg, "launch", "otto_description_test.launch.py")
         )
     )
 
