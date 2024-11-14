@@ -18,12 +18,12 @@ effort_controller:
   ros__parameters:
     joints: 
       # - hip_jointL
-      # - knee_jointL
-      # - virtualhip_jointL
+      - knee_jointL
+      - virtualhip_jointL
       - wheel_jointL
       # - hip_jointR
-      # - knee_jointR
-      # - virtualhip_jointR
+      - knee_jointR
+      - virtualhip_jointR
       - wheel_jointR
 
 velocity_controller:

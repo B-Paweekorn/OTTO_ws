@@ -18,7 +18,7 @@ class Controller(Node):
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
-        self.dt = 0.0002
+        self.dt = 0.001
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
         # HL, KL, VHL, WL, HR, KR, VHR, WR

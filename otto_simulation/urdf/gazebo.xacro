@@ -11,7 +11,7 @@
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
-        <joint name="hip_jointL">
+        <!-- <joint name="hip_jointL">
             <command_interface name="effort">
                 <param name="min">-10000</param>
                 <param name="max">10000</param>
@@ -21,7 +21,7 @@
               </state_interface>
               <state_interface name="velocity"/>
               <state_interface name="effort"/>
-        </joint>
+        </joint> -->
         <joint name="knee_jointL">
             <command_interface name="effort">
                 <param name="min">-10000</param>
@@ -56,7 +56,7 @@
               <state_interface name="effort"/>
         </joint>
 
-        <joint name="hip_jointR">
+        <!-- <joint name="hip_jointR">
             <command_interface name="effort">
                 <param name="min">-10000</param>
                 <param name="max">10000</param>
@@ -66,7 +66,7 @@
               </state_interface>
               <state_interface name="velocity"/>
               <state_interface name="effort"/>
-        </joint>
+        </joint> -->
         <joint name="knee_jointR">
             <command_interface name="effort">
                 <param name="min">-10000</param>
