@@ -111,7 +111,7 @@
       <inertial>
         <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
         <mass value="0.09629"/>
-        <inertia ixx="808404e-10" iyy="1510417e-10" izz="743050e-10" ixy="0.0" iyz="0.0" ixz="0.0"/>
+        <inertia ixx="808404e-9" iyy="1510417e-9" izz="743050e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
       </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
@@ -194,7 +194,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <!-- <limit effort="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="continuous">
@@ -203,7 +203,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <!-- <limit effort="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -212,7 +212,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.001" friction="0.0"/>
-      <limit effort="300.0" velocity="3000"/>
+      <limit effort="300.0" velocity="50"/>
     </joint>
 
     <!-- Right Side -->
@@ -274,7 +274,7 @@
       <inertial>
         <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
         <mass value="0.09629"/>
-        <inertia ixx="808404e-10" iyy="1510417e-10" izz="743050e-10" ixy="0.0" iyz="0.0" ixz="0.0"/>
+        <inertia ixx="808404e-9" iyy="1510417e-9" izz="743050e-9" ixy="0.0" iyz="0.0" ixz="0.0"/>
       </inertial>
       <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/> 
@@ -334,7 +334,7 @@
       <child link="hip_motorR"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 -0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <!-- <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+        <!-- <limit effort="5.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
       </joint>
 
 
@@ -356,7 +356,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <!-- <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="continuous">
@@ -365,7 +365,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <!-- <limit effort="15.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">
@@ -374,7 +374,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 -0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.001" friction="0.0"/>
-      <limit effort="300.0" velocity="3000"/>
+      <limit effort="300.0" velocity="50"/>
     </joint>
 
     <gazebo reference="imu_link">

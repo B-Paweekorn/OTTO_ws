@@ -10,8 +10,7 @@ from geometry_msgs.msg import Twist
 
 class Controller(Node):
     def __init__(self):
-        super().__init__('x_des_to_effort_node')
-        self.create_subscription(Float64MultiArray,'/x_des',self.x_des_callback,10)
+        super().__init__('q_d_to_effort_node')
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
@@ -20,78 +19,65 @@ class Controller(Node):
         self.dt = 0.001
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
-        # HL, KL, VHL, WL, HR, KR, VHR, WR
-        self.x_des = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.joint_state = {}
-        self.ctrl_input = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.dof = 2
+        # KL, VHL, WL, KR, VHR, WR
+        self.q_d = [0.0] * self.dof
+        self.ctrl_input = [0.0] * self.dof
 
-        self.kp = [160.0, 300, 0, 160, 300, 0]
-        self.kd = [5.0, 1.0, 0, 5.0, 1.0, 0]
-        self.ki = [3.0, 0.0, 0, 3, 0, 0]
-        self.integral_error = [0.0] * 6
-        self.integral_limit = 15.0
-
+        # imu
         self.imu_angle = None
         self.gyro = [0.0, 0.0, 0.0]
         self.accel = [0.0, 0.0, 0.0]
-        self.e_i = 0
         
+        # command
         self.vx = 0
         self.w = 0
 
-        self.x_d = 0
-        self.x_s = 0
-        self.neta_d = 0
+        # robot geometry
+        self.r = 0.086
+        self.d = 0.2254
+        self.l = 0.2828
+        self.g = 9.81
+        self.m_b = 3.0
+        self.mu = 0.01
+
+        # LQR Gain (x, vx, th, dth, w, dw)
+        self.lqrL = [-10.0, -14.019, -63.7964, -11.5005, 3.1623, -3.1979]
+        self.lqrR = [-10.0, -14.019, -63.7964, -11.5005, -3.1623, 3.1979]
+
+        self.effort_msg = Float64MultiArray()
+
     def timer_callback(self):
         try:
-            self.integrate()
-            theta = self.imu_angle[1]
-            dtheta = self.gyro[1]
-            omega = (self.joint_state["qd"][1] - self.joint_state["qd"][0])*0.086/0.22584
-            vx_s = (self.joint_state["qd"][0] + self.joint_state["qd"][1])*0.5*0.086
-            self.integrate()
-            self.x_s += vx_s * self.dt
+            th_s = self.imu_angle[1]
+            dth_s = self.gyro[1]
+            w_s = (self.joint_state["qd"][1] - self.joint_state["qd"][0])*self.r/self.d
+            vx_s = (self.joint_state["qd"][0] + self.joint_state["qd"][1])*0.5*self.r
 
-            theta_d = np.arcsin((2*0.01*self.vx/0.086)/(5*0.2828*9.81))
-            self.e_i += (theta_d - theta) * self.dt
+            th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
+            ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
 
-            for i, joint_name in enumerate(self.joint_state["names"]):
-                # pos ctrl
-                if joint_name != "wheel_jointL" and joint_name != "wheel_jointR":
-                    pos_err = self.x_des[i] - self.joint_state["q"][i]
-                    self.integral_error[i] += pos_err * self.dt
-                    self.integral_error[i] = max(min(self.integral_error[i], self.integral_limit), -self.integral_limit)
-                    if abs(pos_err) < 0.0001:
-                         self.integral_error[i] = 0.0
-                    p_term = pos_err * self.kp[i]
-                    i_term = self.integral_error[i] * self.ki[i]
-                    d_term = -self.joint_state["qd"][i] * self.kd[i]
-                    
-                    u_i = p_term + i_term + d_term
-                    if u_i >= 5.0:
-                        u_i = 5.0
-                    elif u_i < -5.0:
-                        u_i = -5.0
-                    self.ctrl_input[i] = u_i
-                elif joint_name == "wheel_jointL":
-                    ffw = (5*0.2828*9.81*np.sin(theta_d) - 2*0.01*self.vx/0.086)/2
-                    tauL = (self.x_d - self.x_s)*0 + (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s) *-13.9589*1 + (self.w - omega) * 0* -3.1891
-                    self.ctrl_input[i] = (ffw + tauL)*1
-                    if self.ctrl_input[i] > 2.2:
-                        self.ctrl_input[i] = 2.2
-                    elif self.ctrl_input[i] < -2.2:
-                        self.ctrl_input[i] = -2.2
+            tauL = (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
+            tauR = (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
 
-                elif joint_name == "wheel_jointR":
-                    ffw = (5*0.2828*9.81*np.sin(theta_d) - 2*0.01*self.vx/0.086)/2
-                    tauR = (self.x_d - self.x_s)*0 + (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s) *-13.9589*1 + (self.w - omega) * 0* 3.1891
-                    self.ctrl_input[i] = (ffw + tauR)*1
-                    if self.ctrl_input[i] > 2.2:
-                        self.ctrl_input[i] = 2.2
-                    elif self.ctrl_input[i] < -2.2:
-                        self.ctrl_input[i] = -2.2
+            self.ctrl_input[0] = ffw + tauL
+            self.ctrl_input[1] = ffw + tauR
 
+            wheel_lim = 2.2
 
+            if self.ctrl_input[0] > wheel_lim:
+                self.ctrl_input[0] = wheel_lim
+            elif self.ctrl_input[0] < -wheel_lim:
+                self.ctrl_input[0] = -wheel_lim
+
+            if self.ctrl_input[1] > wheel_lim:
+                self.ctrl_input[1] = wheel_lim
+            elif self.ctrl_input[1] < -wheel_lim:
+                self.ctrl_input[1] = -wheel_lim
+
+            self.effort_msg.data = self.ctrl_input
+            self.effort_publisher.publish(self.effort_msg)
             state_q_str = ", ".join(f"{np.rad2deg(q):.4f}" for q in self.joint_state["q"])
             state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
             ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
@@ -99,16 +85,9 @@ class Controller(Node):
             print("stateq: ", state_q_str)
             # print("stateqd: ", state_qd_str)
             # print("ctrl_input: ", ctrl_input_str)
-            effort_msg = Float64MultiArray()
-            effort_msg.data = self.ctrl_input
-            self.effort_publisher.publish(effort_msg)
 
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
-    
-    def integrate(self):
-        self.x_d += self.vx*self.dt
-        self.neta_d += self.w*self.dt
 
     def cmd_vel_callback(self, msg):
         self.vx = msg.linear.x
@@ -116,30 +95,27 @@ class Controller(Node):
 
     def feedback_callback(self, msg):
         joint_names = msg.name
-        feedback_q = msg.position
-        feedback_qd = msg.velocity
-        feedback_efforts = msg.effort
+        joint_q = msg.position
+        joint_qd = msg.velocity
+        joint_eff = msg.effort
 
-        desired_order = [
+        order = [
             'knee_jointL', 'virtualhip_jointL', 'wheel_jointL',
             'knee_jointR', 'virtualhip_jointR', 'wheel_jointR'
         ]
 
         joint_data = {
             name: (q, qd, effort)
-            for name, q, qd, effort in zip(joint_names, feedback_q, feedback_qd, feedback_efforts)
+            for name, q, qd, effort in zip(joint_names, joint_q, joint_qd, joint_eff)
         }
 
         self.joint_state = {
-            'names': desired_order,
-            'q': [joint_data[joint][0] for joint in desired_order],
-            'qd': [joint_data[joint][1] for joint in desired_order],
-            'efforts': [joint_data[joint][2] for joint in desired_order]
+            'names': order,
+            'q': [joint_data[joint][0] for joint in order],
+            'qd': [joint_data[joint][1] for joint in order],
+            'efforts': [joint_data[joint][2] for joint in order]
         }
                 
-    def x_des_callback(self, msg):
-        self.x_des = msg.data
-    
     def imu_callback(self, msg):
         orientation_q = msg.orientation
         quaternion = [
@@ -159,7 +135,7 @@ class Controller(Node):
         self.accel[2] = msg.linear_acceleration.z
 
     def stop_robot(self):
-        self.ctrl_input = [0.0] * 6
+        self.ctrl_input = [0.0] * self.dof
         zero_effort_msg = Float64MultiArray()
         zero_effort_msg.data = self.ctrl_input
         self.effort_publisher.publish(zero_effort_msg)
@@ -173,7 +149,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = Controller()
 
-    # Handle graceful shutdown on Ctrl+C
     def signal_handler(sig, frame):
         print("Caught SIGINT, stopping the robot...")
         node.destroy_node()

@@ -63,6 +63,12 @@ def generate_launch_description():
         arguments=["effort_controller", "--controller-manager", "/controller_manager"],
     )
 
+    position_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["position_controller", "--controller-manager", "/controller_manager"],
+    )
+
     launch_description = LaunchDescription()
 
     launch_description.add_action(
@@ -79,6 +85,15 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
                 on_exit=[effort_controller_spawner],
+            )
+        )
+    )
+
+    launch_description.add_action(
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=effort_controller_spawner,
+                on_exit=[position_controller_spawner],
             )
         )
     )

@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 500
+    update_rate: 1000
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -18,12 +18,12 @@ effort_controller:
   ros__parameters:
     joints: 
       # - hip_jointL
-      - knee_jointL
-      - virtualhip_jointL
+      # - knee_jointL
+      # - virtualhip_jointL
       - wheel_jointL
       # - hip_jointR
-      - knee_jointR
-      - virtualhip_jointR
+      # - knee_jointR
+      # - virtualhip_jointR
       - wheel_jointR
 
 velocity_controller:
@@ -35,10 +35,10 @@ velocity_controller:
 position_controller:
   ros__parameters:
     joints:
-      - hip_jointL
+      # - hip_jointL
       - knee_jointL
       - virtualhip_jointL
-      - hip_jointR
+      # - hip_jointR
       - knee_jointR
       - virtualhip_jointR
 

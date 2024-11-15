@@ -23,10 +23,17 @@
               <state_interface name="effort"/>
         </joint> -->
         <joint name="knee_jointL">
-            <command_interface name="effort">
+            <!-- <command_interface name="effort">
                 <param name="min">-10000</param>
                 <param name="max">10000</param>
-              </command_interface>
+              </command_interface> -->
+              <param name="pos_kp">100</param>
+              <param name="pos_ki">1</param>
+              <param name="pos_kd">10</param>
+              <param name="pos_max_integral_error">10000</param>
+        
+              <command_interface name="position_pid"/>
+
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
@@ -34,10 +41,13 @@
               <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointL">
-            <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
-              </command_interface>
+              <param name="pos_kp">100</param>
+              <param name="pos_ki">1</param>
+              <param name="pos_kd">10</param>
+              <param name="pos_max_integral_error">10000</param>
+        
+              <command_interface name="position_pid"/>
+
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
@@ -68,10 +78,12 @@
               <state_interface name="effort"/>
         </joint> -->
         <joint name="knee_jointR">
-            <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
-              </command_interface>
+              <param name="pos_kp">100</param>
+              <param name="pos_ki">1</param>
+              <param name="pos_kd">10</param>
+              <param name="pos_max_integral_error">10000</param>
+        
+              <command_interface name="position_pid"/>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
@@ -79,10 +91,12 @@
               <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointR">
-            <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
-              </command_interface>
+              <param name="pos_kp">100</param>
+              <param name="pos_ki">1</param>
+              <param name="pos_kd">10</param>
+              <param name="pos_max_integral_error">10000</param>
+        
+              <command_interface name="position_pid"/>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
