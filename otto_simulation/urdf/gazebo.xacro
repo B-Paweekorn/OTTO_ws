@@ -56,13 +56,15 @@
         </joint>
         <joint name="wheel_jointL">
             <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
+                <param name="min">-10</param>
+                <param name="max">10</param>
               </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
+              <state_interface name="velocity">
+                <param name="initial_value">0.0</param>
+              </state_interface>
               <state_interface name="effort"/>
         </joint>
 
@@ -105,13 +107,15 @@
         </joint>
         <joint name="wheel_jointR">
             <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
+                <param name="min">-10</param>
+                <param name="max">10</param>
               </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
+              <state_interface name="velocity">
+                <param name="initial_value">0.0</param>
+              </state_interface>
               <state_interface name="effort"/>
         </joint>
     </ros2_control>
@@ -141,6 +145,9 @@
 
     <gazebo reference="leg_linkL">
         <material>Gazebo/Black</material>
+        <minDepth>0.0002</minDepth>
+        <kp  value="1000000.0"/>
+        <kd  value="100.0"/>
     </gazebo>
 
     <gazebo reference="wheel_linkL">
@@ -171,6 +178,9 @@
 
     <gazebo reference="leg_linkR">
         <material>Gazebo/Black</material>
+        <minDepth>0.0002</minDepth>
+        <kp  value="1000000.0"/>
+        <kd  value="100.0"/>
     </gazebo>
 
     <gazebo reference="wheel_linkR">

@@ -45,7 +45,6 @@
       <child link="imu_link"/>
     </joint>
 
-    <!-- Camera -->
     <link name="imu_link">
       <inertial>
         <mass value="1e-5" />
@@ -211,7 +210,7 @@
       <child link="wheel_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.001" friction="0.0"/>
+      <dynamics damping="0.01" friction="0.01"/>
       <limit effort="300.0" velocity="50"/>
     </joint>
 
@@ -373,7 +372,7 @@
       <child link="wheel_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.1414 -0.02 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.001" friction="0.0"/>
+      <dynamics damping="0.01" friction="0.01"/>
       <limit effort="300.0" velocity="50"/>
     </joint>
 
