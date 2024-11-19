@@ -10,8 +10,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
     
 def generate_launch_description():
     
-    pkg = get_package_share_directory('otto_simulation')
-    rviz_path = os.path.join(pkg,'rviz','display.rviz')
+    sim_pkg = get_package_share_directory('otto_simulation')
+    rviz_path = os.path.join(sim_pkg,'rviz','display.rviz')
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -21,7 +21,7 @@ def generate_launch_description():
         
     robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg, "launch", "otto_description.launch.py")
+            os.path.join(sim_pkg, "launch", "otto_description.launch.py")
         )
     )
 
@@ -68,6 +68,12 @@ def generate_launch_description():
         executable="spawner",
         arguments=["position_controller", "--controller-manager", "/controller_manager"],
     )
+    
+    lqr_controller = Node(
+        package='otto_controller',
+        executable='joint_state_controller.py',
+        name='lqr_controller',
+        output='screen')
 
     launch_description = LaunchDescription()
 
@@ -102,6 +108,7 @@ def generate_launch_description():
     # launch_description.add_action(rviz)
     launch_description.add_action(robot)
     launch_description.add_action(gazebo)
+    launch_description.add_action(lqr_controller)
     launch_description.add_action(spawn_entity)
 
     return launch_description
