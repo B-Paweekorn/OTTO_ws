@@ -40,13 +40,15 @@ class Controller(Node):
         self.vx = 0
         self.w = 0
         self.effort_msg = Float64MultiArray()
+
+        self.x_s = 0
     def timer_callback(self):
         try:
             theta = self.imu_angle[1]
             dtheta = self.gyro[1]
             omega = (self.joint_state["qd"][1] - self.joint_state["qd"][0])*0.086/0.22584
             vx_s = (self.joint_state["qd"][0] + self.joint_state["qd"][1])*0.5*0.086
-            
+            self.x_s += vx_s * self.dt
             # print(omega)
 
             theta_d = np.arcsin((2*0.01*self.vx/0.086)/(5*0.2828*9.81))

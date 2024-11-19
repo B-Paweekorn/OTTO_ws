@@ -27,8 +27,8 @@
                 <param name="min">-10000</param>
                 <param name="max">10000</param>
               </command_interface> -->
-              <param name="pos_kp">100</param>
-              <param name="pos_ki">1</param>
+              <param name="pos_kp">300</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -41,8 +41,8 @@
               <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointL">
-              <param name="pos_kp">100</param>
-              <param name="pos_ki">1</param>
+              <param name="pos_kp">300</param>
+              <param name="pos_ki">70</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -80,8 +80,8 @@
               <state_interface name="effort"/>
         </joint> -->
         <joint name="knee_jointR">
-              <param name="pos_kp">100</param>
-              <param name="pos_ki">1</param>
+              <param name="pos_kp">300</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -93,8 +93,8 @@
               <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointR">
-              <param name="pos_kp">100</param>
-              <param name="pos_ki">1</param>
+              <param name="pos_kp">300</param>
+              <param name="pos_ki">70</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -151,8 +151,8 @@
     </gazebo>
 
     <gazebo reference="wheel_linkL">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>0.7</mu1>
+        <mu2>0.7</mu2>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>
@@ -184,8 +184,8 @@
     </gazebo>
 
     <gazebo reference="wheel_linkR">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>0.7</mu1>
+        <mu2>0.7</mu2>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>

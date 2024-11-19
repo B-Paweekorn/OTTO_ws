@@ -172,7 +172,7 @@
       <child link="hip_motorL"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <!-- <limit effort="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+        <!-- <limit effort="4.0"="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
     </joint>
 
     <joint name="hip_motorL_to_knee_motorL" type="fixed">
@@ -193,7 +193,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="continuous">
@@ -202,7 +202,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -355,7 +355,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="continuous">
@@ -364,7 +364,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="5.5" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">

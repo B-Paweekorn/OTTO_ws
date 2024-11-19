@@ -43,8 +43,8 @@ class Controller(Node):
         self.mu = 0.01
 
         # LQR Gain (x, vx, th, dth, w, dw)
-        self.lqrL = [-10.0, -14.019, -63.7964, -11.5005, 3.1623, -3.1979]
-        self.lqrR = [-10.0, -14.019, -63.7964, -11.5005, -3.1623, 3.1979]
+        self.lqrL = [-10.0, -14.019, -65.63, -12.5305, 3.1623, -3.1979]
+        self.lqrR = [-10.0, -14.019, -65.63, -12.5305, -3.1623, 3.1979]
 
         self.effort_msg = Float64MultiArray()
 
@@ -52,8 +52,8 @@ class Controller(Node):
         try:
             th_s = self.imu_angle[1]
             dth_s = self.gyro[1]
-            w_s = (self.joint_state["qd"][1] - self.joint_state["qd"][0])*self.r/self.d
-            vx_s = (self.joint_state["qd"][0] + self.joint_state["qd"][1])*0.5*self.r
+            w_s = (self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d
+            vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
 
             th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
             ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
