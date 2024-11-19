@@ -27,7 +27,7 @@ class RobotKinematics(Node):
 
     def timer_callback(self):
         try:
-            qd_des = self.controller(np.array([self.joint_state["q"][0], self.joint_state["q"][1]]), np.array([0.0, -0.2]))
+            qd_des = self.controller(np.array([self.joint_state["q"][0], self.joint_state["q"][1]]), np.array([0.2, -0.3]))
             q1L_des = self.joint_state["q"][0] + qd_des[0] * self.dt
             q2L_des = self.joint_state["q"][1] + qd_des[1] * self.dt
             print(q1L_des)
@@ -52,12 +52,8 @@ class RobotKinematics(Node):
         return J, J_inv
     
     def controller(self, curr, targ):
-        if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.01:
-            print(np.linalg.det(self.fnc_jacobian(curr)[0]))
-            pass
-        #     # print(self.joint_state)
-        #     self.pos_cmd_msg.data = [0.0, 0.0, 0.0, 0.0]
-        #     # print("Singularlity!!")
+        if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.001:
+            print("Singularlity!!")
         err = targ - self.forward_kinematics(curr) # 1 x 2
         v = err * self.kp
 
