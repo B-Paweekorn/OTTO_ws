@@ -34,6 +34,10 @@ class Controller(Node):
         self.vx = 0
         self.w = 0
 
+        # x_s
+        self.x_s = 0
+        self.xdes_s = 0
+        self.eii = 0
         # robot geometry
         self.r = 0.086
         self.d = 0.2254
@@ -43,8 +47,8 @@ class Controller(Node):
         self.mu = 0.01
 
         # LQR Gain (x, vx, th, dth, w, dw)
-        self.lqrL = [-10.0, -14.019, -65.63, -12.5305, 3.1623, -3.1979]
-        self.lqrR = [-10.0, -14.019, -65.63, -12.5305, -3.1623, 3.1979]
+        self.lqrL = [-10.0, -14.019, -55.63, -12.5305, 3.1623, -3.1979]
+        self.lqrR = [-10.0, -14.019, -55.63, -12.5305, -3.1623, 3.1979]
 
         self.effort_msg = Float64MultiArray()
 
@@ -54,12 +58,15 @@ class Controller(Node):
             dth_s = self.gyro[1]
             w_s = (self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
+            self.x_s += vx_s * self.dt
+            self.xdes_s += self.vx * self.dt
+            self.eii = (self.xdes_s - self.x_s)*self.dt
 
             th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
             ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
 
-            tauL = (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
-            tauR = (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
+            tauL = self.eii*-3 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
+            tauR = self.eii*-3 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
 
             self.ctrl_input[0] = ffw + tauL
             self.ctrl_input[1] = ffw + tauR
@@ -82,7 +89,7 @@ class Controller(Node):
             state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
             ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
 
-            print("stateq: ", state_q_str)
+            # print("stateq: ", state_q_str)
             # print("stateqd: ", state_qd_str)
             # print("ctrl_input: ", ctrl_input_str)
 

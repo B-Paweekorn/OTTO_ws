@@ -29,17 +29,21 @@ class RobotKinematics(Node):
         self.qL = [0.0, 0.0]
         self.qR = [0.0, 0.0]
 
+        self.q1L_des = 0.0
+        self.q2L_des = 0.0
+        self.q1R_des = 0.0
+        self.q2R_des = 0.0
     def timer_callback(self):
         try:
             qLd_des = self.controller(np.array([self.joint_state["q"][0], self.joint_state["q"][1]]), np.array(self.targL))
-            q1L_des = self.joint_state["q"][0] + qLd_des[0] * self.dt
-            q2L_des = self.joint_state["q"][1] + qLd_des[1] * self.dt
+            self.q1L_des += qLd_des[0] * self.dt
+            self.q2L_des += qLd_des[1] * self.dt
 
             qRd_des = self.controller(np.array([self.joint_state["q"][3], self.joint_state["q"][4]]), np.array(self.targR))
-            q1R_des = self.joint_state["q"][3] + qRd_des[0] * self.dt
-            q2R_des = self.joint_state["q"][4] + qRd_des[1] * self.dt
+            self.q1R_des += qRd_des[0] * self.dt
+            self.q2R_des += qRd_des[1] * self.dt
 
-            self.pos_cmd_msg.data = [q1L_des, q2L_des, q1R_des, q2R_des]
+            self.pos_cmd_msg.data = [self.q1L_des, self.q2L_des, self.q1R_des, self.q2R_des]
             # self.pos_cmd_msg.data = [q1L_des*0, q2L_des*0, 0.0, 0.0]
 
             self.pos_cmd_pub.publish(self.pos_cmd_msg)

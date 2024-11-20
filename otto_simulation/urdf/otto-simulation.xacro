@@ -4,13 +4,13 @@
     <xacro:property name="PI" value="3.14159265359"/>
     <xacro:include filename="gazebo.xacro"/>
 
-    <link name="world"></link>
+    <!-- <link name="world"></link>
 
     <joint name="base_joint" type="fixed">
       <origin xyz="0.0 0.0 0.5" rpy="0.0 0.0 0.0"/>
       <parent link="world"/>
       <child link="base_link"/>        
-    </joint>
+    </joint> -->
 
     <!-- Base Link -->
     <link name="base_link">
@@ -172,7 +172,7 @@
       <child link="hip_motorL"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <!-- <limit effort="4.0"="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+        <!-- <limit effort="8.0"="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
     </joint>
 
     <joint name="hip_motorL_to_knee_motorL" type="fixed">
@@ -192,8 +192,8 @@
       <child link="knee_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <dynamics damping="0.22" friction="0.0"/>
+      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="continuous">
@@ -201,8 +201,8 @@
       <child link="leg_linkL"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <dynamics damping="0.22" friction="0.0"/>
+      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -354,8 +354,8 @@
       <child link="knee_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <dynamics damping="0.22" friction="0.0"/>
+      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="continuous">
@@ -363,8 +363,8 @@
       <child link="leg_linkR"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
-      <dynamics damping="0.1" friction="0.0"/>
-      <limit effort="4.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <dynamics damping="0.22" friction="0.0"/>
+      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">
