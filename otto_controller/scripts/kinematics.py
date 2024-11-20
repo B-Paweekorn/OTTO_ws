@@ -12,26 +12,34 @@ class RobotKinematics(Node):
         
         self.timer = self.create_timer(self.dt, self.timer_callback)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
+        self.create_subscription(Float64MultiArray, '/legpose', self.legpose_callback, 10)
+        self.pos_cmd_pub = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
+
+
         self.l1 = 0.2
         self.l2 = 0.2
 
-        self.pos_cmd_pub = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
-
-        self.kp = 30
-        self.targL = [0.0] * 2
-        self.targR = [0.0] * 2
-
-        self.q_desL = [0.0] * 2
+        self.kp = 6
+        self.targL = [0.0, -0.28]
+        self.targR = [0.0, -0.28]
+        self.prev_targ = self.targL + self.targR
         self.joint_state = {}
         self.pos_cmd_msg = Float64MultiArray()
 
+        self.qL = [0.0, 0.0]
+        self.qR = [0.0, 0.0]
+
     def timer_callback(self):
         try:
-            qd_des = self.controller(np.array([self.joint_state["q"][0], self.joint_state["q"][1]]), np.array([0.2, -0.3]))
-            q1L_des = self.joint_state["q"][0] + qd_des[0] * self.dt
-            q2L_des = self.joint_state["q"][1] + qd_des[1] * self.dt
-            print(q1L_des)
-            self.pos_cmd_msg.data = [q1L_des, q2L_des, 0.0, 0.0]
+            qLd_des = self.controller(np.array([self.joint_state["q"][0], self.joint_state["q"][1]]), np.array(self.targL))
+            q1L_des = self.joint_state["q"][0] + qLd_des[0] * self.dt
+            q2L_des = self.joint_state["q"][1] + qLd_des[1] * self.dt
+
+            qRd_des = self.controller(np.array([self.joint_state["q"][3], self.joint_state["q"][4]]), np.array(self.targR))
+            q1R_des = self.joint_state["q"][3] + qRd_des[0] * self.dt
+            q2R_des = self.joint_state["q"][4] + qRd_des[1] * self.dt
+
+            self.pos_cmd_msg.data = [q1L_des, q2L_des, q1R_des, q2R_des]
             # self.pos_cmd_msg.data = [q1L_des*0, q2L_des*0, 0.0, 0.0]
 
             self.pos_cmd_pub.publish(self.pos_cmd_msg)
@@ -47,22 +55,28 @@ class RobotKinematics(Node):
         J = np.array([[-self.l1*np.sin(np.deg2rad(45)-q[0]) - self.l2*np.sin(np.deg2rad(45)+q[0]+q[1]), -self.l2*np.sin(np.deg2rad(45)+q[0]+q[1])], 
                       [self.l1*np.cos(np.deg2rad(45)-q[0]) - self.l2*np.cos(np.deg2rad(45)+q[0]+q[1]), -self.l2*np.cos(np.deg2rad(45)+q[0]+q[1])]])
 
-
         J_inv = np.linalg.inv(J)
         return J, J_inv
     
     def controller(self, curr, targ):
-        if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.001:
+        if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.0001:
             print("Singularlity!!")
         err = targ - self.forward_kinematics(curr) # 1 x 2
         v = err * self.kp
 
         q_dot = np.matmul(self.fnc_jacobian(curr)[1], np.transpose(v))
-        print(q_dot)
         return q_dot # 2 x 1
 
-    def integrate(self, ):
-        pass
+    def legpose_callback(self, msg):
+        self.targL[0] = msg.data[0]
+        self.targL[1] = msg.data[1]
+        self.targR[0] = msg.data[2]
+        self.targR[1] = msg.data[3]
+        if self.targL + self.targR != self.prev_targ:
+            print("received new target")
+            self.prev_targ = self.targL + self.targR
+            self.qL = [self.joint_state["q"][0], self.joint_state["q"][1]]
+            self.qR = [self.joint_state["q"][3], self.joint_state["q"][4]]
 
     def feedback_callback(self, msg):
         joint_names = msg.name

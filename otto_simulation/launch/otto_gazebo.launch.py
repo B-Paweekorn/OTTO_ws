@@ -108,7 +108,7 @@ def generate_launch_description():
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
     launch_description.add_action(gazebo)
-    # launch_description.add_action(lqr_controller)
+    launch_description.add_action(lqr_controller)
     launch_description.add_action(spawn_entity)
 
     return launch_description
