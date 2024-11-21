@@ -19,7 +19,7 @@ class RobotKinematics(Node):
         self.l1 = 0.2
         self.l2 = 0.2
 
-        self.kp = 6
+        self.kp = 2
         self.targL = [0.0, -0.28]
         self.targR = [0.0, -0.28]
         self.prev_targ = self.targL + self.targR

@@ -47,11 +47,12 @@ class Controller(Node):
         self.mu = 0.01
 
         # LQR Gain (x, vx, th, dth, w, dw)
-        self.lqrL = [-10.0, -14.019, -55.63, -12.5305, 3.1623, -3.1979]
-        self.lqrR = [-10.0, -14.019, -55.63, -12.5305, -3.1623, 3.1979]
+        self.lqrL = [-6.0, -14.019, -55.63, -11.5305, 3.1623, -3.1979]
+        self.lqrR = [-6.0, -14.019, -55.63, -11.5305, -3.1623, 3.1979]
 
         self.effort_msg = Float64MultiArray()
-
+        
+        self.flag = 0
     def timer_callback(self):
         try:
             th_s = self.imu_angle[1]
@@ -60,13 +61,22 @@ class Controller(Node):
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             self.x_s += vx_s * self.dt
             self.xdes_s += self.vx * self.dt
+            # if self.vx == 0 and abs(vx_s) <= 0.001:
+            #     if self.flag == 0:
+            #         self.xdes_s = self.x_s
+            #         self.flag = 1
+            #         print("stop")
+            # else:
+            #     self.xdes_s = self.x_s
+            #     self.flag = 0
+
             self.eii = (self.xdes_s - self.x_s)*self.dt
 
             th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
             ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
 
-            tauL = self.eii*-3 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
-            tauR = self.eii*-3 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
+            tauL = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
+            tauR = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
 
             self.ctrl_input[0] = ffw + tauL
             self.ctrl_input[1] = ffw + tauR
