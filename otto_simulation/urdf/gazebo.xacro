@@ -28,7 +28,7 @@
                 <param name="max">10000</param>
               </command_interface> -->
               <param name="pos_kp">220</param>
-              <param name="pos_ki">20</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">8</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -42,7 +42,7 @@
         </joint>
         <joint name="virtualhip_jointL">
               <param name="pos_kp">300</param>
-              <param name="pos_ki">70</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -81,7 +81,7 @@
         </joint> -->
         <joint name="knee_jointR">
               <param name="pos_kp">220</param>
-              <param name="pos_ki">20</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">8</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -94,7 +94,7 @@
         </joint>
         <joint name="virtualhip_jointR">
               <param name="pos_kp">300</param>
-              <param name="pos_ki">70</param>
+              <param name="pos_ki">0</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -151,11 +151,11 @@
     </gazebo>
 
     <gazebo reference="wheel_linkL">
-        <mu1>1.5</mu1>
-        <mu2>1.5</mu2>
+        <mu1>3.5</mu1>
+        <mu2>3.5</mu2>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
-        <kd  value="100.0"/>
+        <kd  value="1000.0"/>
     </gazebo>
     
 
@@ -180,12 +180,12 @@
         <material>Gazebo/Black</material>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
-        <kd  value="100.0"/>
+        <kd  value="1000.0"/>
     </gazebo>
 
     <gazebo reference="wheel_linkR">
-        <mu1>1.5</mu1>
-        <mu2>1.5</mu2>
+        <mu1>3.5</mu1>
+        <mu2>3.5</mu2>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>

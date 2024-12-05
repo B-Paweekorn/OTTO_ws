@@ -12,7 +12,7 @@ class JoyControl(Node):
         super().__init__('joy_control')
         self.subscription = self.create_subscription(Joy, '/joy', self.joy_callback, 10)
         self.pub_cmd = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.leg_cmd = self.create_publisher(Float64MultiArray, '/legpose', 10)
+        self.leg_cmd = self.create_publisher(Float64MultiArray, '/legcmd', 10)
 
         self.twist = Twist()
         self.v_max = 1.5

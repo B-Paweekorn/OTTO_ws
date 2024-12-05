@@ -15,8 +15,10 @@ class Controller(Node):
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
+        self.state_publisher = self.create_publisher(Float64MultiArray, '/robot_state', 10)
 
-        self.dt = 0.001
+        self.create_subscription(Float64MultiArray, "/legpose", self.legpose_callback,10)
+        self.dt = 0.0002
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
         self.joint_state = {}
@@ -36,7 +38,11 @@ class Controller(Node):
 
         # x_s
         self.x_s = 0
+        self.phi = 0
         self.xdes_s = 0
+        self.phides = 0
+
+        self.phii = 0
         self.eii = 0
         # robot geometry
         self.r = 0.086
@@ -47,12 +53,17 @@ class Controller(Node):
         self.mu = 0.01
 
         # LQR Gain (x, vx, th, dth, w, dw)
-        self.lqrL = [-6.0, -14.019, -55.63, -11.5305, 3.1623, -3.1979]
-        self.lqrR = [-6.0, -14.019, -55.63, -11.5305, -3.1623, 3.1979]
+        self.lqrL = [-6.0, -14.019, -55.63, -11.5305, -3.1623, -3.1979]
+        self.lqrR = [-6.0, -14.019, -55.63, -11.5305, 3.1623, 3.1979]
 
+        # self.lqrL = [-10.0, -10.019, -26.63, -5.5305, 10.1623, -8.1979]
+        # self.lqrR = [-10.0, -10.019, -26.63, -5.5305, -10.1623, 8.1979]
         self.effort_msg = Float64MultiArray()
-        
-        self.flag = 0
+        self.robot_state = Float64MultiArray()
+        self.flag_lqr = 0
+
+        self.legL = []
+        self.legR = []
     def timer_callback(self):
         try:
             th_s = self.imu_angle[1]
@@ -61,6 +72,9 @@ class Controller(Node):
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             self.x_s += vx_s * self.dt
             self.xdes_s += self.vx * self.dt
+
+            self.phides += self.w * self.dt
+            self.phi += w_s * self.dt
             # if self.vx == 0 and abs(vx_s) <= 0.001:
             #     if self.flag == 0:
             #         self.xdes_s = self.x_s
@@ -70,16 +84,24 @@ class Controller(Node):
             #     self.xdes_s = self.x_s
             #     self.flag = 0
 
-            self.eii = (self.xdes_s - self.x_s)*self.dt
+            self.eii += (self.xdes_s - self.x_s)*self.dt
+            self.phii += (self.phides - self.phi)*self.dt
 
             th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
             ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
 
-            tauL = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
-            tauR = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
+            tauL = self.eii*-1.2 + self.phii*-0.707*2 + (self.xdes_s - self.x_s)*self.lqrL[0] + (0 - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]*1  + (self.phides - self.phi) * self.lqrL[4]*1
+            tauR = self.eii*-1.2 + self.phii*0.707*2 + (self.xdes_s - self.x_s)*self.lqrR[0] + (0 - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]*1 + (self.phides - self.phi) * self.lqrR[4]*1
 
-            self.ctrl_input[0] = ffw + tauL
-            self.ctrl_input[1] = ffw + tauR
+            if abs(self.joint_state["q"][0]) < 0.01 and abs(vx_s) < 0.1 and self.flag_lqr == 0:
+                self.lqrL = [-11, -5.11, -24.72, -3.5305, -2.7, -4.5]
+                self.lqrR = [-11, -5.11, -24.72, -3.5305, 2.7, 4.5]
+                self.flag_lqr = 1
+                self.get_logger().info("switched controller ...............")
+                
+
+            self.ctrl_input[0] = ffw*0 + tauL
+            self.ctrl_input[1] = ffw*0 + tauR
 
             wheel_lim = 2.2
 
@@ -103,12 +125,18 @@ class Controller(Node):
             # print("stateqd: ", state_qd_str)
             # print("ctrl_input: ", ctrl_input_str)
 
+            self.robot_state.data = [vx_s, th_s, dth_s]
+            self.state_publisher.publish(self.robot_state)
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
 
     def cmd_vel_callback(self, msg):
         self.vx = msg.linear.x
         self.w = msg.angular.z
+
+    def legpose_callback(self, msg):
+        self.legL = [msg.data[0], msg.data[1]]
+        self.legR = [msg.data[2], msg.data[3]]
 
     def feedback_callback(self, msg):
         joint_names = msg.name
