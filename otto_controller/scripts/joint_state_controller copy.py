@@ -15,7 +15,7 @@ class Controller(Node):
         self.create_subscription(Float64MultiArray,'/x_des',self.x_des_callback,10)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
-        self.create_subscription(Twist, 'traj/cmd_vel', self.cmd_vel_callback, 10)
+        self.create_subscription(Twist, '/traj/cmd_vel', self.cmd_vel_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
         self.dt = 0.001
@@ -68,10 +68,10 @@ class Controller(Node):
             # print(np.rad2deg(theta_d))
             # tauL = (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s)* -13.9589 + (self.w - omega) * -3.1891
             # tauR = (theta_d - theta) * -65.63 + dtheta * 12.5305 + (self.vx - vx_s)* -13.9589 + (self.w - omega) * +3.1891
-            tauL = self.e_i*-0.707*0 + (self.x_d - self.x_s)* -3.25*0 + (0 - theta) * -24 + dtheta * 6.8 + (self.vx - vx_s)* -12.80 + (self.w - omega) * -4.16
-            tauR = self.e_i*-0.707*0 + (self.x_d - self.x_s)* -3.25*0 + (0 - theta) * -24 + dtheta * 6.8 + (self.vx - vx_s)* -12.80 + (self.w - omega) * +4.16
-            self.ctrl_input[0] = 1*ffw + tauL
-            self.ctrl_input[1] = 1*ffw + tauR
+            tauL = self.e_i*-0.707*0 + (self.x_d - self.x_s)* -3.25*1 + (0 - theta) * -24 + dtheta * 6.8 + (self.vx - vx_s)* -12.80 + (self.w - omega) * -4.16
+            tauR = self.e_i*-0.707*0 + (self.x_d - self.x_s)* -3.25*1 + (0 - theta) * -24 + dtheta * 6.8 + (self.vx - vx_s)* -12.80 + (self.w - omega) * +4.16
+            self.ctrl_input[0] = 0*ffw + tauL
+            self.ctrl_input[1] = 0*ffw + tauR
 
             if self.ctrl_input[0] > 2.2:
                 self.ctrl_input[0] = 2.2
@@ -83,7 +83,7 @@ class Controller(Node):
             elif self.ctrl_input[1] < -2.2:
                 self.ctrl_input[1] = -2.2
 
-            print(vx_s)
+            # print(vx_s)
             # print(dtheta)
             # print(np.rad2deg(theta_d), np.rad2deg(theta))
             state_q_str = ", ".join(f"{q:.4f}" for q in self.joint_state["q"])
