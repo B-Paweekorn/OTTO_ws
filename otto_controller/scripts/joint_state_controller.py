@@ -49,8 +49,8 @@ class Controller(Node):
         
         # state: x th1 yaw dx dth1 dyaw x_i yaw_i
         self.K_lqr = np.array([
-        [-6.0, -30.63, -6.1623, -8.019, -10.5305, -1.1979, -2, 0],
-        [-6.0, -30.63, 6.1623, -8.019, -10.5305, 1.1979, -2, 0]
+        [-6.0, -30.63, -6.1623, -8.019, -10.5305, -1.1979, 0.707, 0],
+        [-6.0, -30.63, 6.1623, -8.019, -10.5305, 1.1979, 0.707, 0]
         ])
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
@@ -73,8 +73,13 @@ class Controller(Node):
 
             self.x_s += vx_s * self.dt
             th_s = self.imu_angle[1]
-            yaw_s = np.unwrap([self.imu_angle[2]])[0]
-            self.x_i = (self.x_cmd - self.x_s)*self.dt
+            yaw_s = self.imu_angle[2]
+            # self.x_i += (self.x_cmd - self.x_s)*self.dt
+
+            # if abs(self.vx_cmd) <= 0.01 and self.prev_vx != 0.0:
+            #     self.xdes_s = self.x_s + 0.5*vx_s
+            #     self.x_i = 0
+            # self.prev_vx = self.vx_cmd
 
             # =============== Command =================
             self.x_cmd += self.vx_cmd * self.dt
