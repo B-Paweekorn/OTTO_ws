@@ -8,20 +8,16 @@ import tf_transformations
 import numpy as np
 from geometry_msgs.msg import Twist
 
+# ROBOT PARAMETER
 class Controller(Node):
     def __init__(self):
-        super().__init__('q_d_to_effort_node')
-        self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
-        self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
-        self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
-        self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
-
-        self.dt = 0.0005
-        self.timer = self.create_timer(self.dt, self.timer_callback)
+        super().__init__('joint_level_control')
+        self.dt = 1/2000
 
         self.joint_state = {}
-        self.dof = 2
+
         # KL, VHL, WL, KR, VHR, WR
+        self.dof = 2
         self.q_d = [0.0] * self.dof
         self.ctrl_input = [0.0] * self.dof
 
@@ -31,14 +27,18 @@ class Controller(Node):
         self.accel = [0.0, 0.0, 0.0]
         
         # command
-        self.vx = 0
+        self.vx_cmd = 0
         self.prev_vx = 0
-        self.w = 0
+        self.w_cmd = 0
 
         # x_s
         self.x_s = 0
-        self.xdes_s = 0
-        self.eii = 0
+        self.x_cmd = 0
+        self.x_i = 0
+
+        self.yaw_cmd = 0
+        self.prev_yaw = 0.0
+        self.yaw_offset = 0.0
         # robot geometry
         self.r = 0.086
         self.d = 0.2254
@@ -46,41 +46,60 @@ class Controller(Node):
         self.g = 9.81
         self.m_b = 1.5
         self.mu = 0.01
-
-        # LQR Gain (x, vx, th, dth, w, dw)
-        # self.lqrL = [-6.0, -8.019, -40.63, -7.5305, 6.1623, -1.1979]
-        # self.lqrR = [-6.0, -8.019, -40.63, -7.5305, -6.1623, 1.1979]
-
-        self.lqrL = [-6.0, -8.019, -30.63, -10.5305, 6.1623, -1.1979]
-        self.lqrR = [-6.0, -8.019, -30.63, -10.5305, -6.1623, 1.1979]
-        self.effort_msg = Float64MultiArray()
         
-        self.flag = 0
+        # state: x th1 yaw dx dth1 dyaw x_i yaw_i
+        self.K_lqr = np.array([
+        [-6.0, -30.63, -6.1623, -8.019, -10.5305, -1.1979, -2, 0],
+        [-6.0, -30.63, 6.1623, -8.019, -10.5305, 1.1979, -2, 0]
+        ])
+
+        self.timer = self.create_timer(self.dt, self.timer_callback)
+
+        self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
+        self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
+        self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+        self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
+
+        self.effort_msg = Float64MultiArray()
+    
     def timer_callback(self):
+        # state: x th1 th2 yaw dx dth1 dth2 dyaw x_i yaw_i
+        # u: l_wheel r_wheel
         try:
-            th_s = self.imu_angle[1]
-            dth_s = self.gyro[1]
-            w_s = self.gyro[2] # 0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d
+            # =============== State =================
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
+            dth_s = self.gyro[1]
+            w_s = self.gyro[2]
+
             self.x_s += vx_s * self.dt
-            self.xdes_s += self.vx * self.dt
-            self.flag  =w_s
+            th_s = self.imu_angle[1]
+            yaw_s = np.unwrap([self.imu_angle[2]])[0]
+            self.x_i = (self.x_cmd - self.x_s)*self.dt
 
-            self.eii = (self.xdes_s - self.x_s)*self.dt
-            if abs(self.vx) <= 0.1 and self.prev_vx != 0.0:
-                self.xdes_s = self.x_s + 0.5*vx_s
-                self.eii = 0
+            # =============== Command =================
+            self.x_cmd += self.vx_cmd * self.dt
+            self.yaw_cmd += self.w_cmd * self.dt
+            th_cmd = np.arcsin((2*self.mu*self.vx_cmd/self.r)/(self.m_b*self.l*self.g))
+            ffw = (self.m_b*self.l*self.g*np.sin(th_cmd) - 2*self.mu*self.vx_cmd/self.r)/2
 
-            self.prev_vx = self.vx
+            # =============== LQR Controller =================
+            """ x th yaw
+                vx dth dyaw
+                x_i yaw_i """
+            
+            state_d = np.array([self.x_cmd, th_cmd, self.yaw_cmd, 
+                                0, 0, 0,
+                                0, 0])
+            
+            state = np.array([self.x_s, th_s, yaw_s,
+                             vx_s, dth_s, w_s,
+                             self.x_i, 0])
 
-            th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
-            ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
+            error = state_d - state
+            U = self.K_lqr @ error
 
-            tauL = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
-            tauR = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
-
-            self.ctrl_input[0] = ffw + tauL
-            self.ctrl_input[1] = ffw + tauR
+            self.ctrl_input[0] = ffw + U[0]
+            self.ctrl_input[1] = ffw + U[1]
 
             wheel_lim = 2.2
 
@@ -96,21 +115,13 @@ class Controller(Node):
 
             self.effort_msg.data = self.ctrl_input
             self.effort_publisher.publish(self.effort_msg)
-            state_q_str = ", ".join(f"{np.rad2deg(q):.4f}" for q in self.joint_state["q"])
-            state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
-            ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
-
-            # print("stateq: ", state_q_str)
-            # print("stateqd: ", state_qd_str)
-            # print("ctrl_input: ", ctrl_input_str)
 
         except (TypeError, IndexError, KeyError) as e:
-            # pass
             self.get_logger().error(f"Error updating control input: {e}")
 
     def cmd_vel_callback(self, msg):
-        self.vx = msg.linear.x
-        self.w = msg.angular.z
+        self.vx_cmd = msg.linear.x
+        self.w_cmd = msg.angular.z
 
     def feedback_callback(self, msg):
         joint_names = msg.name
@@ -144,12 +155,11 @@ class Controller(Node):
             orientation_q.w
         ]
         
-        self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
+        self.imu_angle = list(tf_transformations.euler_from_quaternion(quaternion))
         rotation_matrix = tf_transformations.quaternion_matrix(quaternion)[:3, :3]
-        #         self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
-        r = self.imu_angle[0]
-        p = self.imu_angle[1]
-        y = self.imu_angle[2]
+        r, p, y = self.imu_angle
+        self.imu_angle[2] = self.unwrap_yaw(y)
+
         rotation_matrix = np.array([
             [np.cos(p), 0, -np.cos(r)*np.sin(p)],
             [0, 1, np.sin(r)],
@@ -163,15 +173,20 @@ class Controller(Node):
         
         self.gyro = np.dot(rotation_matrix.T, gyro_sensor)
 
-        # self.gyro[0] = msg.angular_velocity.x
-        # self.gyro[2] = self.gyro[0] * np.sin(p) + msg.angular_velocity.z * np.cos(r) * np.cos(p)
-        # self.gyro[1] = msg.angular_velocity.y + np.sin(p) * self.gyro[2]
-        # print(self.flag, self.gyro[2], msg.angular_velocity.z)
         self.accel[0] = msg.linear_acceleration.x
         self.accel[1] = msg.linear_acceleration.y
         self.accel[2] = msg.linear_acceleration.z
     
-
+    def unwrap_yaw(self, yaw):
+        delta_yaw = yaw - self.prev_yaw
+        if delta_yaw > np.pi:
+            self.yaw_offset -= 2 * np.pi
+        elif delta_yaw < -np.pi:
+            self.yaw_offset += 2 * np.pi
+        
+        self.prev_yaw = yaw
+        return yaw + self.yaw_offset
+    
     def stop_robot(self):
         self.ctrl_input = [0.0] * self.dof
         zero_effort_msg = Float64MultiArray()
