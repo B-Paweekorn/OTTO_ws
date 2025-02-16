@@ -29,7 +29,8 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/dummy_script.py
   scripts/joint_state_controller.py
-
+  scripts/otto_xbox.py
+  scripts/kinematics.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

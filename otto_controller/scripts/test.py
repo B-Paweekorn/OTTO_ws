@@ -1,165 +1,195 @@
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float64MultiArray
+from sensor_msgs.msg import JointState, Imu
+import signal
+import tf_transformations
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from matplotlib.widgets import Slider
-class FourBarMechanism:
-    def __init__(self, L1, L2, L3, L4, L5, MODE, t1_init, t2_init):
-        self.mode = MODE
+from geometry_msgs.msg import Twist
 
-        self.L1 = L1  # (Input) A-D link
-        self.L2 = L2  # (Input) A-B link
-        self.L3 = L3  # B-C link
-        self.L4 = L4  # C-D link
-        self.L5 = L5  # D-E link (extension)
+class Controller(Node):
+    def __init__(self):
+        super().__init__('q_d_to_effort_node')
+        self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
+        self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
+        self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+        self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
+
+        self.dt = 0.001
+        self.timer = self.create_timer(self.dt, self.timer_callback)
+
+        self.joint_state = {}
+        self.dof = 2
+        # KL, VHL, WL, KR, VHR, WR
+        self.q_d = [0.0] * self.dof
+        self.ctrl_input = [0.0] * self.dof
+
+        # imu
+        self.imu_angle = None
+        self.gyro = [0.0, 0.0, 0.0]
+        self.accel = [0.0, 0.0, 0.0]
         
-        self.t1 = t1_init
-        self.t2 = t2_init
-        self.t1_init = t1_init  # Initial angle for self.t1
-        self.t2_init = t2_init  # Initial angle for self.t2
+        # command
+        self.vx = 0
+        self.prev_vx = 0
+        self.w = 0
 
-        self.kp = 1
+        # x_s
+        self.x_s = 0
+        self.xdes_s = 0
+        self.eii = 0
+        # robot geometry
+        self.r = 0.086
+        self.d = 0.2254
+        self.l = 0.2828
+        self.g = 9.81
+        self.m_b = 3.0
+        self.mu = 0.01
 
-        # Set up the plot
-        self.fig, self.ax = plt.subplots()
-        self.ax.set_aspect('equal')
-        self.ax.set_xlim(-7, 7)
-        self.ax.set_ylim(-7, 7)
-        self.ax.grid(True)  # Add grid to the plot
+        # LQR Gain (x, vx, th, dth, w, dw)
+        # self.lqrL = [-2.0, -8.019, -40.63, -11.5305, 3.1623, -3.1979]
+        # self.lqrR = [-2.0, -8.019, -40.63, -11.5305, -3.1623, 3.1979]
 
-        # Links and end-effector
-        self.link1, = self.ax.plot([], [], 'k-', lw=2)
-        self.link2, = self.ax.plot([], [], 'b-', lw=2)
-        self.link3, = self.ax.plot([], [], 'k-', lw=2)
-        self.link4, = self.ax.plot([], [], 'b-', lw=2)
-        self.link5, = self.ax.plot([], [], 'g-', lw=2)
-        self.star, = self.ax.plot([], [], marker='*', color='blue', markersize=3)  # End-effector
-
-        # Create sliders
-        ax_slider_x = plt.axes([0.20, 0.95, 0.65, 0.02], facecolor='lightgoldenrodyellow')
-        self.slider_x = Slider(ax_slider_x, 'targ_x', -10.0, 10.0, valinit=0)
-
-        ax_slider_y = plt.axes([0.20, 0.91, 0.65, 0.02], facecolor='lightgoldenrodyellow')
-        self.slider_y = Slider(ax_slider_y, 'targ_y', -10.0, 10.0, valinit=-2.2)
-
-        self.slider_x.on_changed(self.update_target)
-        self.slider_y.on_changed(self.update_target)
-
-        self.target_x = self.slider_x.val
-        self.target_y = self.slider_y.val
-    
-        # Connect the click event
-        self.fig.canvas.mpl_connect('button_press_event', self.on_click)
-
-    def on_click(self, event):
-        """Handle mouse click events to set target coordinates."""
-        if event.inaxes == self.ax and self.mode == "jac":
-            self.target_x = event.xdata
-            self.target_y = event.ydata
-            print(f"Target updated: x={self.target_x}, y={self.target_y}")
-
-    def update_target(self, val):
-        if self.mode == "inv":
-            self.target_x = self.slider_x.val
-            self.target_y = self.slider_y.val
-
-    def solve_fourbar(self):
-        A = np.array([0, 0])
-        B = np.array([self.L2 * np.cos(self.t2), self.L2 * np.sin(self.t2)])
-        C = np.array([B[0] + self.L3 * np.cos(self.t1), B[1] + self.L3 * np.sin(self.t1)])
-        D = np.array([self.L1 * np.cos(self.t1), self.L1 * np.sin(self.t1)])
-        E = np.array([D[0] - self.L5 * np.cos(self.t2), D[1] - self.L5 * np.sin(self.t2)])
-
-        return A, B, C, D, E
-
-    def forward_kin(self):
-        return np.array([self.L1 * np.cos(self.t1) - self.L5 * np.cos(self.t2),
-                         self.L1 * np.sin(self.t1) - self.L5 * np.sin(self.t2)])
-    
-    def fnc_jacobian(self):
-        J = np.array([[-L1*np.sin(self.t1), L5*np.sin(self.t2)], [L1*np.cos(self.t1), -L5*np.cos(self.t2)]])
-        J_inv = np.linalg.inv(J)
-        return J, J_inv
-
-    def inverse_kin(self, x, y):
-        t1 = np.arctan2(-y, x) - np.angle((abs(L1) * abs(L5) * (x**2 - L5**2 - L1**2 + y**2 + 2 * L1 * L5 * 
-            np.imag(np.sqrt(-(L1**4 - 2 * L1**2 * L5**2 - 2 * L1**2 * x**2 - 2 * L1**2 * y**2 + L5**4 - 
-            2 * L5**2 * x**2 - 2 * L5**2 * y**2 + x**4 + 2 * x**2 * y**2 + y**4) / (4 * L1**2 * L5**2)))+ 
-            L1 * L5 * np.real(np.sqrt(-(L1**4 - 2 * L1**2 * L5**2 - 2 * L1**2 * x**2 - 2 * L1**2 * y**2 + 
-            L5**4 - 2 * L5**2 * x**2 - 2 * L5**2 * y**2 + x**4 + 2 * x**2 * y**2 + y**4) / (4 * L1**2 * L5**2))) * 2j + 
-            (L1**2 * abs(L1**2 + L5**2 - x**2 - y**2 + L1 * L5 * np.sqrt(-(L1**4 - 2 * L1**2 * L5**2 - 2 * L1**2 * x**2 - 2 * L1**2 * y**2 + L5**4 - 
-            2 * L5**2 * x**2 - 2 * L5**2 * y**2 + x**4 + 2 * x**2 * y**2 + y**4) / (4 * L1**2 * L5**2)) * 2j)) / 
-            (abs(L1) * abs(L5)))) / (L1 * abs(L1**2 + L5**2 - x**2 - y**2 + L1 * L5 * 
-            np.sqrt(-(L1**4 - 2 * L1**2 * L5**2 - 2 * L1**2 * x**2 - 2 * L1**2 * y**2 + L5**4 - 
-            2 * L5**2 * x**2 - 2 * L5**2 * y**2 + x**4 + 2 * x**2 * y**2 + y**4) / (4 * L1**2 * L5**2)) * 2j)))
-
-        t2 = np.angle((L1**2 + L5**2 - x**2 - y**2 + L1*L5*(-(L1**4 - 2*L1**2*L5**2 - 2*L1**2*x**2 - 2*L1**2*y**2 + L5**4 - 2*L5**2*x**2 - 2*L5**2*y**2 + x**4 + 2*x**2*y**2 + y**4) / 
-             (4*L1**2*L5**2))**(1/2) * 2j) / (L1 * L5)) - np.arctan2(-y, x) + np.angle((np.abs(L1) * np.abs(L5) * (x**2 - L5**2 - L1**2 + y**2 + 2*L1*L5*np.imag((-(L1**4 - 2*L1**2*L5**2 - 2*L1**2*x**2 - 2*L1**2*y**2 + L5**4 - 2*L5**2*x**2 - 2*L5**2*y**2 + x**4 + 2*x**2*y**2 + y**4) / \
-             (4*L1**2*L5**2))**(1/2)) + L1*L5*np.real((-(L1**4 - 2*L1**2*L5**2 - 2*L1**2*x**2 - 2*L1**2*y**2 + L5**4 - 2*L5**2*x**2 - 2*L5**2*y**2 + x**4 + 2*x**2*y**2 + y**4) / (4*L1**2*L5**2))**(1/2)) * 2j + 
-             (L1**2 * np.abs(L1**2 + L5**2 - x**2 - y**2 + L1*L5*(-(L1**4 - 2*L1**2*L5**2 - 2*L1**2*x**2 - 2*L1**2*y**2 + L5**4 - 2*L5**2*x**2 - 2*L5**2*y**2 + x**4 + 2*x**2*y**2 + y**4) / (4*L1**2*L5**2))**(1/2) * 2j)) / (np.abs(L1) * np.abs(L5)))) / \
-             (L1 * np.abs(L1**2 + L5**2 - x**2 - y**2 + L1*L5*(-(-(L1**4 - 2*L1**2*L5**2 - 2*L1**2*x**2 - 2*L1**2*y**2 + L5**4 - 2*L5**2*x**2 - 2*L5**2*y**2 + x**4 + 2*x**2*y**2 + y**4) / (4*L1**2*L5**2))**(1/2) * 2j))))
-        print(np.rad2deg(t1), np.rad2deg(t2))
-        return -t1, t2
-    
-    def controller(self, curr ,targ):
-        if abs(np.linalg.det(self.fnc_jacobian()[0])) < 0.1:
-            print("Singularlity!!")
-            self.mode = "inv"
-            return np.array([0, 0])
-        err = targ - curr # 1 x 2
-        v = err * self.kp
-        q_dot = np.matmul(self.fnc_jacobian()[1], np.transpose(v))
-        # print(q_dot)
-        return q_dot
-
-    def init(self):
-        self.link1.set_data([], [])
-        self.link2.set_data([], [])
-        self.link3.set_data([], [])
-        self.link4.set_data([], [])
-        self.link5.set_data([], [])
-        self.star.set_data([], [])
-        return self.link1, self.link2, self.link3, self.link4, self.link5, self.star
-
-    def animate(self, i):
-        if self.mode == "inv":
-            targ_x = self.slider_x.val
-            targ_y = self.slider_y.val
-            self.t1, self.t2 = self.inverse_kin(targ_x, targ_y)
-        if self.mode == "jac":
-            p_c = self.forward_kin()
-            p_t = np.array([self.target_x, self.target_y]) 
-            q_dot = self.controller(p_c, p_t)
-            self.t1 = self.t1 + q_dot[0] * 0.1
-            self.t2 = self.t2 + q_dot[1] * 0.1
-
-        A, B, C, D, E = self.solve_fourbar()
-
-        self.link1.set_data([A[0], D[0]], [A[1], D[1]])
-        self.link2.set_data([A[0], B[0]], [A[1], B[1]])
-        self.link3.set_data([B[0], C[0]], [B[1], C[1]])
-        self.link4.set_data([C[0], D[0]], [C[1], D[1]])
-        self.link5.set_data([D[0], E[0]], [D[1], E[1]])
-
-        eff = self.forward_kin()
-        self.star.set_data(eff[0], eff[1])
-
-        return self.link1, self.link2, self.link3, self.link4, self.link5, self.star
-
-    def run(self):
-        # Create animation
-        ani = FuncAnimation(self.fig, self.animate, frames=10000, init_func=self.init, blit=False, interval=0.1)
-        plt.show()
+        self.lqrL = [-2.0, -15.019, -60.63, -21.5305, 3.1623, -8.1979]
+        self.lqrR = [-2.0, -15.019, -60.63, -21.5305, -3.1623, 8.1979]
+        self.effort_msg = Float64MultiArray()
+        
+        self.flag = 0
+    def timer_callback(self):
+        try:
+            # p = self.imu_angle[0]
+            # q = self.imu_angle[1]
+            # r = self.imu_angle[2]
+                
+            # w_s = np.sin()
+            th_s = self.imu_angle[1] 
+            dth_s = self.gyro[1]
+            w_s = self.gyro[2] * np.cos(self.imu_angle[0]) * np.cos(self.imu_angle[1]) + self.gyro[2] * np.sin(self.imu_angle[1]) 
+            vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
+            self.x_s += vx_s * self.dt
+            self.xdes_s += self.vx * self.dt
 
 
-L1 = 2.0  # (Input) A-D link
-L2 = 0.8  # (Input) A-B link
-L3 = 2.0  # B-C link
-L4 = 0.8  # C-D link
-L5 = 2.0  # D-E link (extension)
-t1_init = np.deg2rad(-45)
-t2_init = np.deg2rad(45)
+            # if self.vx == 0 and abs(vx_s) <= 0.001:
+            #     if self.flag == 0:
+            #         self.xdes_s = self.x_s
+            #         self.flag = 1
+            #         print("stop")
+            # else:
+            #     self.xdes_s = self.x_s
+            #     self.flag = 0
 
-MODE = "jac"
+            self.eii = (self.xdes_s - self.x_s)*self.dt
+            if self.vx == 0.0 and self.prev_vx != 0.0:
+                self.xdes_s = self.x_s
+                self.eii = 0
+                self.get_logger().info("ttt")
 
-mechanism = FourBarMechanism(L1, L2, L3, L4, L5, MODE, t1_init, t2_init)
-mechanism.run()
+            self.prev_vx = self.vx
+            self.get_logger().info(f"{self.x_s}, {self.xdes_s}")
+            th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
+            ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
+
+            tauL = self.eii*-0 + (self.xdes_s - self.x_s)*self.lqrL[0] + (self.vx - vx_s) * self.lqrL[1] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.w - w_s) * self.lqrL[5]
+            tauR = self.eii*-0 + (self.xdes_s - self.x_s)*self.lqrR[0] + (self.vx - vx_s) * self.lqrR[1] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.w - w_s) * self.lqrR[5]
+
+            self.ctrl_input[0] = ffw + tauL
+            self.ctrl_input[1] = ffw + tauR
+
+            wheel_lim = 2.2
+
+            if self.ctrl_input[0] > wheel_lim:
+                self.ctrl_input[0] = wheel_lim
+            elif self.ctrl_input[0] < -wheel_lim:
+                self.ctrl_input[0] = -wheel_lim
+
+            if self.ctrl_input[1] > wheel_lim:
+                self.ctrl_input[1] = wheel_lim
+            elif self.ctrl_input[1] < -wheel_lim:
+                self.ctrl_input[1] = -wheel_lim
+
+            self.effort_msg.data = self.ctrl_input
+            self.effort_publisher.publish(self.effort_msg)
+            state_q_str = ", ".join(f"{np.rad2deg(q):.4f}" for q in self.joint_state["q"])
+            state_qd_str = ", ".join(f"{qd:.4f}" for qd in self.joint_state["qd"])
+            ctrl_input_str = ", ".join(f"{ci:.4f}" for ci in self.ctrl_input)
+
+            # print("stateq: ", state_q_str)
+            # print("stateqd: ", state_qd_str)
+            # print("ctrl_input: ", ctrl_input_str)
+
+        except (TypeError, IndexError, KeyError) as e:
+            self.get_logger().error(f"Error updating control input: {e}")
+
+    def cmd_vel_callback(self, msg):
+        self.vx = msg.linear.x
+        self.w = msg.angular.z
+
+    def feedback_callback(self, msg):
+        joint_names = msg.name
+        joint_q = msg.position
+        joint_qd = msg.velocity
+        joint_eff = msg.effort
+
+        order = [
+            'knee_jointL', 'virtualhip_jointL', 'wheel_jointL',
+            'knee_jointR', 'virtualhip_jointR', 'wheel_jointR'
+        ]
+
+        joint_data = {
+            name: (q, qd, effort)
+            for name, q, qd, effort in zip(joint_names, joint_q, joint_qd, joint_eff)
+        }
+
+        self.joint_state = {
+            'names': order,
+            'q': [joint_data[joint][0] for joint in order],
+            'qd': [joint_data[joint][1] for joint in order],
+            'efforts': [joint_data[joint][2] for joint in order]
+        }
+                
+    def imu_callback(self, msg):
+        orientation_q = msg.orientation
+        quaternion = [
+            orientation_q.x,
+            orientation_q.y,
+            orientation_q.z,
+            orientation_q.w
+        ]
+        
+        self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
+        self.gyro[0] = msg.angular_velocity.x
+        self.gyro[1] = msg.angular_velocity.y
+        self.gyro[2] = msg.angular_velocity.z
+
+        self.accel[0] = msg.linear_acceleration.x
+        self.accel[1] = msg.linear_acceleration.y
+        self.accel[2] = msg.linear_acceleration.z
+
+    def stop_robot(self):
+        self.ctrl_input = [0.0] * self.dof
+        zero_effort_msg = Float64MultiArray()
+        zero_effort_msg.data = self.ctrl_input
+        self.effort_publisher.publish(zero_effort_msg)
+        print("Robot stopped with zero effort.")
+
+    def destroy_node(self):
+        self.stop_robot()
+        super().destroy_node()
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = Controller()
+
+    def signal_handler(sig, frame):
+        print("Caught SIGINT, stopping the robot...")
+        node.destroy_node()
+        rclpy.shutdown()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

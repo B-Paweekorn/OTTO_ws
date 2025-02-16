@@ -15,10 +15,8 @@ class Controller(Node):
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
-        self.state_publisher = self.create_publisher(Float64MultiArray, '/robot_state', 10)
 
-        self.create_subscription(Float64MultiArray, "/legpose", self.legpose_callback,10)
-        self.dt = 0.0002
+        self.dt = 0.0005
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
         self.joint_state = {}
@@ -29,79 +27,60 @@ class Controller(Node):
 
         # imu
         self.imu_angle = None
-        self.gyro = [0.0, 0.0, 0.0]
+        self.gyro = [0.0, 0.0, 0.0] # rpy
         self.accel = [0.0, 0.0, 0.0]
         
         # command
         self.vx = 0
+        self.prev_vx = 0
         self.w = 0
 
         # x_s
         self.x_s = 0
-        self.phi = 0
         self.xdes_s = 0
-        self.phides = 0
-
-        self.phii = 0
         self.eii = 0
         # robot geometry
         self.r = 0.086
         self.d = 0.2254
         self.l = 0.2828
         self.g = 9.81
-        self.m_b = 3.0
+        self.m_b = 1.5
         self.mu = 0.01
 
         # LQR Gain (x, vx, th, dth, w, dw)
-        self.lqrL = [-6.0, -14.019, -55.63, -11.5305, -2.5, -3.1979]
-        self.lqrR = [-6.0, -14.019, -55.63, -11.5305, 2.5, 3.1979]
+        # self.lqrL = [-6.0, -8.019, -40.63, -7.5305, 6.1623, -1.1979]
+        # self.lqrR = [-6.0, -8.019, -40.63, -7.5305, -6.1623, 1.1979]
 
-        # self.lqrL = [-10.0, -10.019, -26.63, -5.5305, 10.1623, -8.1979]
-        # self.lqrR = [-10.0, -10.019, -26.63, -5.5305, -10.1623, 8.1979]
+        self.lqrL = [-6.0, -8.019, -30.63, -10.5305, 6.1623, -1.1979]
+        self.lqrR = [-6.0, -8.019, -30.63, -10.5305, -6.1623, 1.1979]
         self.effort_msg = Float64MultiArray()
-        self.robot_state = Float64MultiArray()
-        self.flag_lqr = 0
-
-        self.legL = []
-        self.legR = []
+        
+        self.flag = 0
     def timer_callback(self):
         try:
             th_s = self.imu_angle[1]
             dth_s = self.gyro[1]
-            w_s = (self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d
+            w_s = self.gyro[2] # 0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             self.x_s += vx_s * self.dt
             self.xdes_s += self.vx * self.dt
+            self.flag  =w_s
 
-            self.phides += self.w * self.dt
-            self.phi = self.imu_angle[2]
-            # if self.vx == 0 and abs(vx_s) <= 0.001:
-            #     if self.flag == 0:
-            #         self.xdes_s = self.x_s
-            #         self.flag = 1
-            #         print("stop")
-            # else:
-            #     self.xdes_s = self.x_s
-            #     self.flag = 0
+            self.eii = (self.xdes_s - self.x_s)*self.dt
+            if abs(self.vx) <= 0.1 and self.prev_vx != 0.0:
+                self.xdes_s = self.x_s + 0.5*vx_s
+                self.eii = 0
 
-            self.eii += (self.xdes_s - self.x_s)*self.dt
-            self.phii += (self.phides - self.phi)*self.dt
+            self.prev_vx = self.vx
 
             th_d = np.arcsin((2*self.mu*self.vx/self.r)/(self.m_b*self.l*self.g))
             ffw = (self.m_b*self.l*self.g*np.sin(th_d) - 2*self.mu*self.vx/self.r)/2
 
-            tauL = self.eii*-1.2 + self.phii*-0.107*0 + (self.xdes_s - self.x_s)*self.lqrL[0] + (0 - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]*1  + (self.phides - self.phi) * self.lqrL[4]*1
-            tauR = self.eii*-1.2 + self.phii*0.107*0 + (self.xdes_s - self.x_s)*self.lqrR[0] + (0 - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]*1 + (self.phides - self.phi) * self.lqrR[4]*1
+            tauL = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrL[0] + (th_d - th_s) * self.lqrL[2] + (0 - dth_s) * self.lqrL[3] + (self.vx - vx_s) * self.lqrL[1] + (self.w - w_s) * self.lqrL[5]
+            tauR = self.eii*-2 + (self.xdes_s - self.x_s)*self.lqrR[0] + (th_d - th_s) * self.lqrR[2] + (0 - dth_s) * self.lqrR[3] + (self.vx - vx_s) * self.lqrR[1] + (self.w - w_s) * self.lqrR[5]
 
-            if abs(self.joint_state["q"][0]) < 0.01 and abs(vx_s) < 0.1 and self.flag_lqr == 0:
-                self.lqrL = [-11, -5.11, -24.72, -3.5305, -2.7, -4.5]
-                self.lqrR = [-11, -5.11, -24.72, -3.5305, 2.7, 4.5]
-                self.flag_lqr = 1
-                self.get_logger().info("switched controller ...............")
-                
-
-            self.ctrl_input[0] = ffw*0 + tauL
-            self.ctrl_input[1] = ffw*0 + tauR
+            self.ctrl_input[0] = ffw + tauL
+            self.ctrl_input[1] = ffw + tauR
 
             wheel_lim = 2.2
 
@@ -125,18 +104,13 @@ class Controller(Node):
             # print("stateqd: ", state_qd_str)
             # print("ctrl_input: ", ctrl_input_str)
 
-            self.robot_state.data = [vx_s, th_s, dth_s]
-            self.state_publisher.publish(self.robot_state)
         except (TypeError, IndexError, KeyError) as e:
+            # pass
             self.get_logger().error(f"Error updating control input: {e}")
 
     def cmd_vel_callback(self, msg):
         self.vx = msg.linear.x
         self.w = msg.angular.z
-
-    def legpose_callback(self, msg):
-        self.legL = [msg.data[0], msg.data[1]]
-        self.legR = [msg.data[2], msg.data[3]]
 
     def feedback_callback(self, msg):
         joint_names = msg.name
@@ -171,13 +145,32 @@ class Controller(Node):
         ]
         
         self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
-        self.gyro[0] = msg.angular_velocity.x
-        self.gyro[1] = msg.angular_velocity.y
-        self.gyro[2] = msg.angular_velocity.z
+        rotation_matrix = tf_transformations.quaternion_matrix(quaternion)[:3, :3]
+        #         self.imu_angle = tf_transformations.euler_from_quaternion(quaternion)
+        r = self.imu_angle[0]
+        p = self.imu_angle[1]
+        y = self.imu_angle[2]
+        rotation_matrix = np.array([
+            [np.cos(p), 0, -np.cos(r)*np.sin(p)],
+            [0, 1, np.sin(r)],
+            [np.sin(p), 0, np.cos(r)*np.cos(p)]
+        ])
+        gyro_sensor = np.array([
+            msg.angular_velocity.x,
+            msg.angular_velocity.y,
+            msg.angular_velocity.z
+        ])
+        
+        self.gyro = np.dot(rotation_matrix.T, gyro_sensor)
 
+        # self.gyro[0] = msg.angular_velocity.x
+        # self.gyro[2] = self.gyro[0] * np.sin(p) + msg.angular_velocity.z * np.cos(r) * np.cos(p)
+        # self.gyro[1] = msg.angular_velocity.y + np.sin(p) * self.gyro[2]
+        # print(self.flag, self.gyro[2], msg.angular_velocity.z)
         self.accel[0] = msg.linear_acceleration.x
         self.accel[1] = msg.linear_acceleration.y
         self.accel[2] = msg.linear_acceleration.z
+    
 
     def stop_robot(self):
         self.ctrl_input = [0.0] * self.dof

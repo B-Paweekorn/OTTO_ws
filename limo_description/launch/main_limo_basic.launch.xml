@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- External Argument Declarations (if needed) -->
+    <arg name="use_sim_time" default="true" description="Whether to use simulation time"/>
+    <arg name="gui" default="true" description="Whether to launch the Gazebo GUI"/>
+    <arg name="world" default="$(find-pkg-share limo_description)/worlds/basic.world" description="Which world file to load"/>
+    <arg name="urdf_model" default="$(find-pkg-share limo_description)/urdf/limo_four_acker.xacro" description="Which robot model we use"/>
+
+    <!-- Including another launch file with arguments -->
+    <include file="$(find-pkg-share limo_description)/launch/gazebo_models_diff_mod_basics.launch.py">
+        <!-- Pass arguments to the included launch file -->
+        <arg name="use_sim_time" value="$(var use_sim_time)"/>
+        <arg name="gui" value="$(var gui)"/>
+        <arg name="world" value="$(var world)"/>
+        <arg name="world" value="$(var world)"/>
+        <arg name="urdf_model" value="$(var urdf_model)"/>
+        
+    </include>
+</launch>

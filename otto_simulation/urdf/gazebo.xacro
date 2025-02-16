@@ -28,7 +28,7 @@
                 <param name="max">10000</param>
               </command_interface> -->
               <param name="pos_kp">220</param>
-              <param name="pos_ki">0</param>
+              <param name="pos_ki">20</param>
               <param name="pos_kd">8</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -42,7 +42,7 @@
         </joint>
         <joint name="virtualhip_jointL">
               <param name="pos_kp">300</param>
-              <param name="pos_ki">0</param>
+              <param name="pos_ki">70</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -56,8 +56,8 @@
         </joint>
         <joint name="wheel_jointL">
             <command_interface name="effort">
-                <param name="min">-5</param>
-                <param name="max">5</param>
+                <param name="min">-10</param>
+                <param name="max">10</param>
               </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
@@ -81,7 +81,7 @@
         </joint> -->
         <joint name="knee_jointR">
               <param name="pos_kp">220</param>
-              <param name="pos_ki">0</param>
+              <param name="pos_ki">20</param>
               <param name="pos_kd">8</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -94,7 +94,7 @@
         </joint>
         <joint name="virtualhip_jointR">
               <param name="pos_kp">300</param>
-              <param name="pos_ki">0</param>
+              <param name="pos_ki">70</param>
               <param name="pos_kd">10</param>
               <param name="pos_max_integral_error">10000</param>
         
@@ -107,8 +107,8 @@
         </joint>
         <joint name="wheel_jointR">
             <command_interface name="effort">
-                <param name="min">-5</param>
-                <param name="max">5</param>
+                <param name="min">-10</param>
+                <param name="max">10</param>
               </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
@@ -136,25 +136,26 @@
     </gazebo>
 
     <gazebo reference="hip_linkL">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/FlatBlack</material>
     </gazebo>
 
     <gazebo reference="knee_linkL">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/FlatBlack</material>
     </gazebo>
 
     <gazebo reference="leg_linkL">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/FlatBlack</material>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>
     </gazebo>
 
     <gazebo reference="wheel_linkL">
-        <mu1>10.0</mu1>
-        <mu2>10.0</mu2>
+        <mu1>1.5</mu1>
+        <mu2>1.5</mu2>
+
         <minDepth>0.0002</minDepth>
-        <kp  value="1000000.0"/>
+        <kp  value="10000.0"/>
         <kd  value="1000.0"/>
     </gazebo>
     
@@ -169,25 +170,26 @@
     </gazebo>
 
     <gazebo reference="hip_linkR">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/FlatBlack</material>
     </gazebo>
 
     <gazebo reference="knee_linkR">
-        <material>Gazebo/Black</material>
+        <material>Gazebo/FlatBlack</material>
     </gazebo>
 
     <gazebo reference="leg_linkR">
-        <material>Gazebo/Black</material>
-        <minDepth>0.0002</minDepth>
-        <kp  value="1000000.0"/>
-        <kd  value="1000.0"/>
-    </gazebo>
-
-    <gazebo reference="wheel_linkR">
-        <mu1>10.0</mu1>
-        <mu2>10.0</mu2>
+        <material>Gazebo/FlatBlack</material>
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
         <kd  value="100.0"/>
+    </gazebo>
+
+    <gazebo reference="wheel_linkR">
+        <mu1>1.5</mu1>
+        <mu2>1.5</mu2>
+        <minDepth>0.0002</minDepth>
+
+        <kp  value="10000.0"/>
+        <kd  value="1000.0"/>
     </gazebo>
 </robot>

@@ -4,12 +4,28 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 import os
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler, DeclareLaunchArgument
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-    
+from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.actions import SetEnvironmentVariable
+
 def generate_launch_description():
-    
+    set_gazebo_model_path = SetEnvironmentVariable(
+        name='GAZEBO_MODEL_PATH',
+        value='/home/chawre/OTTO_demo/install/limo_description/share/limo_description/models'
+    )
+        
+    world = DeclareLaunchArgument(
+        'world', 
+        default_value=os.path.join(
+            get_package_share_directory('limo_description'),
+            'worlds',
+            'basic.world'
+        )
+    )
+
     sim_pkg = get_package_share_directory('otto_simulation')
     rviz_path = os.path.join(sim_pkg,'rviz','display.rviz')
     rviz = Node(
@@ -34,7 +50,7 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            'pause': 'true'
+            # 'pause': 'true'
         }.items()
     )
 
@@ -46,7 +62,8 @@ def generate_launch_description():
             "-entity", "otto",
             "-x", "0.0",
             "-y", "0.0",   
-            "-z", "0.38" 
+            "-z", "0.38",
+            '-Y', "0.0"
         ],
         output = "screen"
     )
@@ -73,6 +90,12 @@ def generate_launch_description():
         package='otto_controller',
         executable='joint_state_controller.py',
         name='lqr_controller',
+        output='screen')
+    
+    joy = Node(
+        package='otto_controller',
+        executable='otto_xbox.py',
+        name='otto_xbox',
         output='screen')
 
     launch_description = LaunchDescription()
@@ -107,8 +130,10 @@ def generate_launch_description():
     # Add the rest of the nodes and launch descriptions
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
+    # launch_description.add_action(world)
     launch_description.add_action(gazebo)
     launch_description.add_action(lqr_controller)
     launch_description.add_action(spawn_entity)
+    launch_description.add_action(joy)
 
     return launch_description
