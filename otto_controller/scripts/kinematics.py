@@ -107,10 +107,7 @@ class RobotKinematics(Node):
             'qd': [joint_data[joint][1] for joint in order],
             'efforts': [joint_data[joint][2] for joint in order]
         }
-        # try:
-        #     print(self.forward_kinematics(self.joint_state["q"][0], self.joint_state["q"][1]))
-        # except (TypeError, IndexError, KeyError) as e:
-        #     self.get_logger().error(f"[ERROR]{e}")
+
 def main(args=None):
     rclpy.init(args=args)
     node = RobotKinematics()

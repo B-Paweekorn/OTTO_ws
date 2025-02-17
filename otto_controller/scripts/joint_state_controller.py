@@ -7,11 +7,14 @@ import signal
 import tf_transformations
 import numpy as np
 from geometry_msgs.msg import Twist
+import time
 
 # ROBOT PARAMETER
 class Controller(Node):
     def __init__(self):
         super().__init__('joint_level_control')
+        self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
+
         self.dt = 1/2000
 
         self.joint_state = {}
@@ -36,32 +39,59 @@ class Controller(Node):
         self.x_cmd = 0
         self.x_i = 0
 
+        # yaw
         self.yaw_cmd = 0
         self.prev_yaw = 0.0
         self.yaw_offset = 0.0
-        # robot geometry
+
+        # LEG variables -----------------------------------------
+        self.targL = [0.0, -0.28]
+        self.targR = [0.0, -0.28]
+        self.prev_targ = 0.0
+        self.q_kneeL_des = 0.0
+        self.q_kneeR_des = 0.0
+        self.q_hipL_des = 0.0
+        self.q_hipR_des = 0.0
+        self.singularity = False
+
+        # Robot parameters -----------------------------------------
         self.r = 0.086
         self.d = 0.2254
         self.l = 0.2828
         self.g = 9.81
         self.m_b = 1.5
-        self.mu = 0.01
-        
-        # state: x th1 yaw dx dth1 dyaw x_i yaw_i
+        self.mu = 0.001
+
+        self.l1 = 0.2
+        self.l2 = 0.2
+
+        # Gain parameters -------------- # state: x th1 yaw dx dth1 dyaw x_i yaw_i
+
         self.K_lqr = np.array([
-        [-6.0, -30.63, -6.1623, -8.019, -10.5305, -1.1979, 0.707, 0],
-        [-6.0, -30.63, 6.1623, -8.019, -10.5305, 1.1979, 0.707, 0]
+        [-6.0, -30.63, -10.1623, -8.019, -10.5305, -1.1979, 0.707, 0],
+        [-6.0, -30.63, 10.1623, -8.019, -10.5305, 1.1979, 0.707, 0]
         ])
+
+        self.K_height = 2.5
+
+        # ROS2 -----------------------------------------
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
+        # ROS2 Wheel
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
-        self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
 
+        self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
         self.effort_msg = Float64MultiArray()
     
+        # ROS2 Leg
+        self.pos_cmd_pub = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
+        self.create_subscription(Float64MultiArray, '/legpose', self.legpose_callback, 10)
+
+        self.pos_cmd_msg = Float64MultiArray()
+
     def timer_callback(self):
         # state: x th1 th2 yaw dx dth1 dth2 dyaw x_i yaw_i
         # u: l_wheel r_wheel
@@ -74,12 +104,6 @@ class Controller(Node):
             self.x_s += vx_s * self.dt
             th_s = self.imu_angle[1]
             yaw_s = self.imu_angle[2]
-            # self.x_i += (self.x_cmd - self.x_s)*self.dt
-
-            # if abs(self.vx_cmd) <= 0.01 and self.prev_vx != 0.0:
-            #     self.xdes_s = self.x_s + 0.5*vx_s
-            #     self.x_i = 0
-            # self.prev_vx = self.vx_cmd
 
             # =============== Command =================
             self.x_cmd += self.vx_cmd * self.dt
@@ -107,22 +131,63 @@ class Controller(Node):
             self.ctrl_input[1] = ffw + U[1]
 
             wheel_lim = 2.2
+            self.ctrl_input = np.clip(self.ctrl_input, -wheel_lim, wheel_lim)
 
-            if self.ctrl_input[0] > wheel_lim:
-                self.ctrl_input[0] = wheel_lim
-            elif self.ctrl_input[0] < -wheel_lim:
-                self.ctrl_input[0] = -wheel_lim
-
-            if self.ctrl_input[1] > wheel_lim:
-                self.ctrl_input[1] = wheel_lim
-            elif self.ctrl_input[1] < -wheel_lim:
-                self.ctrl_input[1] = -wheel_lim
-
-            self.effort_msg.data = self.ctrl_input
+            self.effort_msg.data = self.ctrl_input.tolist()
             self.effort_publisher.publish(self.effort_msg)
+            
+            # =============== HEIGHT MANNUAL Controller =================
+            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
+                legL_s = np.array([self.joint_state["q"][0], self.joint_state["q"][1]])
+                legR_s = np.array([self.joint_state["q"][3], self.joint_state["q"][4]])
+                qd_L = self.height_controller(legL_s, np.array(self.targL))
+                self.q_kneeL_des += qd_L[0] * self.dt
+                self.q_hipL_des += qd_L[1] * self.dt
+                
+                qd_R = self.height_controller(legR_s, np.array(self.targR))
+                self.q_kneeR_des += qd_R[0] * self.dt
+                self.q_hipR_des += qd_R[1] * self.dt
+
+                if not self.singularity:
+                    self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
+                    self.pos_cmd_pub.publish(self.pos_cmd_msg)
+
 
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
+    
+    def forward_kinematics(self, q):
+        x = -self.l1*np.cos(np.deg2rad(45) - q[0]) + self.l2*np.cos(np.deg2rad(45) + q[1] + q[0])
+        z = -self.l1*np.sin(np.deg2rad(45) - q[0]) - self.l2*np.sin(np.deg2rad(45) + q[1] + q[0])
+        return np.array([x,z])
+    
+    def fnc_jacobian(self, q):
+        J = np.array([[-self.l1*np.sin(np.deg2rad(45)-q[0]) - self.l2*np.sin(np.deg2rad(45)+q[0]+q[1]), -self.l2*np.sin(np.deg2rad(45)+q[0]+q[1])], 
+                      [self.l1*np.cos(np.deg2rad(45)-q[0]) - self.l2*np.cos(np.deg2rad(45)+q[0]+q[1]), -self.l2*np.cos(np.deg2rad(45)+q[0]+q[1])]])
+
+        J_inv = np.linalg.inv(J)
+        return J, J_inv
+    
+    def height_controller(self, curr, targ):
+        if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.0001:
+            print("Singularlity!!")
+            self.singularity = True
+            return [0, 0]
+        self.singularity = False
+        err = targ - self.forward_kinematics(curr) # 1 x 2
+        v = err * self.K_height
+
+        q_dot = np.matmul(self.fnc_jacobian(curr)[1], np.transpose(v))
+        return q_dot # 2 x 1
+
+    def legpose_callback(self, msg):
+        self.targL[0] = msg.data[0]
+        self.targL[1] = msg.data[1]
+        self.targR[0] = msg.data[2]
+        self.targR[1] = msg.data[3]
+        if self.targL + self.targR != self.prev_targ:
+            # print("received new target")
+            self.prev_targ = self.targL + self.targR
 
     def cmd_vel_callback(self, msg):
         self.vx_cmd = msg.linear.x
