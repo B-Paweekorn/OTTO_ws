@@ -153,6 +153,7 @@ class Controller(Node):
                     self.pos_cmd_pub.publish(self.pos_cmd_msg)
 
 
+
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
     
