@@ -1,40 +1,52 @@
 #!/usr/bin/env python3
 
+import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-import os
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler, DeclareLaunchArgument
+from launch.actions import (
+    IncludeLaunchDescription,
+    RegisterEventHandler,
+    DeclareLaunchArgument,
+    SetEnvironmentVariable
+)
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch.actions import SetEnvironmentVariable
+from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
+    # Set GAZEBO_MODEL_PATH dynamically
     set_gazebo_model_path = SetEnvironmentVariable(
         name='GAZEBO_MODEL_PATH',
-        value='/home/chawre/OTTO_demo/install/limo_description/share/limo_description/models'
-    )
-        
-    world = DeclareLaunchArgument(
-        'world', 
-        default_value=os.path.join(
+        value=os.path.join(
             get_package_share_directory('limo_description'),
-            'worlds',
-            'basic.world'
+            'models'
         )
     )
 
+    # Declare world argument
+    world = DeclareLaunchArgument(
+        'world',
+        default_value=os.path.join(
+            get_package_share_directory('limo_description'),
+            'worlds',
+            'simple-ramp.world'
+        )
+    )
+
+    # Paths and package directories
     sim_pkg = get_package_share_directory('otto_simulation')
-    rviz_path = os.path.join(sim_pkg,'rviz','display.rviz')
+    rviz_path = os.path.join(sim_pkg, 'rviz', 'display.rviz')
+
+    # Nodes and launch files
     rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz',
         arguments=['-d', rviz_path],
-        output='screen')
-        
+        output='screen'
+    )
+
     robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(sim_pkg, "launch", "otto_description.launch.py")
@@ -49,9 +61,7 @@ def generate_launch_description():
                 'gazebo.launch.py'
             )
         ),
-        launch_arguments={
-            # 'pause': 'true'
-        }.items()
+        launch_arguments={'world': LaunchConfiguration('world')}.items()
     )
 
     spawn_entity = Node(
@@ -60,12 +70,12 @@ def generate_launch_description():
         arguments=[
             "-topic", "robot_description",
             "-entity", "otto",
-            "-x", "0.0",
-            "-y", "0.0",   
+            "-x", "2.0",
+            "-y", "0.0",
             "-z", "0.38",
             '-Y', "0.0"
         ],
-        output = "screen"
+        output="screen"
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -85,21 +95,31 @@ def generate_launch_description():
         executable="spawner",
         arguments=["position_controller", "--controller-manager", "/controller_manager"],
     )
-    
+
     lqr_controller = Node(
         package='otto_controller',
         executable='joint_state_controller.py',
         name='lqr_controller',
-        output='screen')
-    
+        output='screen'
+    )
+
     joy = Node(
         package='otto_controller',
         executable='otto_xbox.py',
         name='otto_xbox',
-        output='screen')
+        output='screen'
+    )
 
+    # Launch description
     launch_description = LaunchDescription()
 
+    # Add environment variable
+    launch_description.add_action(set_gazebo_model_path)
+
+    # Add world declaration
+    launch_description.add_action(world)
+
+    # Event Handlers for controllers
     launch_description.add_action(
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -127,10 +147,9 @@ def generate_launch_description():
         )
     )
 
-    # Add the rest of the nodes and launch descriptions
+    # Add nodes and launch files
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
-    # launch_description.add_action(world)
     launch_description.add_action(gazebo)
     launch_description.add_action(lqr_controller)
     launch_description.add_action(spawn_entity)

@@ -150,15 +150,19 @@
         <kd  value="100.0"/>
     </gazebo>
 
-    <gazebo reference="wheel_linkL">
-        <mu1>1.5</mu1>
-        <mu2>1.5</mu2>
-
+    <gazebo reference="wheel_linkR">
+        <mu1>2.0</mu1>
+        <mu2>2.0</mu2>
         <minDepth>0.0002</minDepth>
-        <kp  value="10000.0"/>
-        <kd  value="1000.0"/>
+
+        <kp>100000.0</kp>
+        <kd>10000.0</kd>
+
+        <material>default</material> 
+
+        <maxVel>0.0</maxVel>
+        <restitution_coefficient>0.0</restitution_coefficient>
     </gazebo>
-    
 
 
     <gazebo reference="hip_motorR">
@@ -185,11 +189,17 @@
     </gazebo>
 
     <gazebo reference="wheel_linkR">
-        <mu1>1.5</mu1>
-        <mu2>1.5</mu2>
+        <mu1>2.0</mu1>
+        <mu2>2.0</mu2>
         <minDepth>0.0002</minDepth>
 
-        <kp  value="10000.0"/>
-        <kd  value="1000.0"/>
+        <kp>100000.0</kp>
+        <kd>10000.0</kd>
+
+        <material>default</material> 
+
+        <maxVel>0.0</maxVel>
+        <restitution_coefficient>0.0</restitution_coefficient>
     </gazebo>
+
 </robot>

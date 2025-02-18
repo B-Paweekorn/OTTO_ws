@@ -56,7 +56,7 @@ class Controller(Node):
 
         # Robot parameters -----------------------------------------
         self.r = 0.086
-        self.d = 0.2254
+        self.d = 0.270*4
         self.l = 0.2828
         self.g = 9.81
         self.m_b = 1.5
@@ -72,7 +72,7 @@ class Controller(Node):
         [-6.0, -30.63, 10.1623, -8.019, -10.5305, 1.1979, 0.707, 0]
         ])
 
-        self.K_height = 2.5
+        self.K_height = 30
 
         # ROS2 -----------------------------------------
 
@@ -102,6 +102,7 @@ class Controller(Node):
             w_s = self.gyro[2]
 
             self.x_s += vx_s * self.dt
+            roll_s = self.imu_angle[0]
             th_s = self.imu_angle[1]
             yaw_s = self.imu_angle[2]
 
@@ -137,7 +138,7 @@ class Controller(Node):
             self.effort_publisher.publish(self.effort_msg)
             
             # =============== HEIGHT MANNUAL Controller =================
-            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
+            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 20:
                 legL_s = np.array([self.joint_state["q"][0], self.joint_state["q"][1]])
                 legR_s = np.array([self.joint_state["q"][3], self.joint_state["q"][4]])
                 # qd_L = self.height_controller(legL_s, np.array(self.targL))
@@ -149,10 +150,25 @@ class Controller(Node):
                 # self.q_hipR_des += qd_R[1] * self.dt
 
            # ======================= LEAN ANGLE TASK =======================
-                self.targR[1] = (self.l + (self.vx_cmd*self.w_cmd*self.d)/(self.g*self.l*2))
-                self.targL[1] = (2*self.l - self.targR[1])
-                self.targR[1] = self.targR[1] * -1
-                self.targL[1] = self.targL[1] * -1
+                # self.targR[1] = (self.l + (self.vx_cmd*self.w_cmd*self.d)/(self.g*self.l*2))
+                # self.targL[1] = (2*self.l - self.targR[1])
+                # self.targR[1] = self.targR[1] * -1
+                # self.targL[1] = self.targL[1] * -1
+                # qd_L = self.height_controller(legL_s, np.array(self.targL))
+                # self.q_kneeL_des += qd_L[0] * self.dt
+                # self.q_hipL_des += qd_L[1] * self.dt
+                
+                # qd_R = self.height_controller(legR_s, np.array(self.targR))
+                # self.q_kneeR_des += qd_R[0] * self.dt
+                # self.q_hipR_des += qd_R[1] * self.dt
+                R = 0.5*self.d*np.tan(roll_s) + self.l
+                # R = 0.5*self.d*np.tan(-np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l)) - roll_s) - self.l
+                L = 2*self.l - R
+
+                print(roll_s, R, L)
+                self.targR[1] = -R
+                self.targL[1] = -L
+
                 qd_L = self.height_controller(legL_s, np.array(self.targL))
                 self.q_kneeL_des += qd_L[0] * self.dt
                 self.q_hipL_des += qd_L[1] * self.dt
@@ -161,10 +177,9 @@ class Controller(Node):
                 self.q_kneeR_des += qd_R[0] * self.dt
                 self.q_hipR_des += qd_R[1] * self.dt
 
-
-                if not self.singularity:
-                    self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
-                    self.pos_cmd_pub.publish(self.pos_cmd_msg)
+                # if not self.singularity:
+                #     self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
+                #     self.pos_cmd_pub.publish(self.pos_cmd_msg)
             
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
@@ -239,6 +254,7 @@ class Controller(Node):
         ]
         
         self.imu_angle = list(tf_transformations.euler_from_quaternion(quaternion))
+        # self.imu_angle = [orientation_q.roll, orientation_q.pitch, orientation_q.yaw]
         rotation_matrix = tf_transformations.quaternion_matrix(quaternion)[:3, :3]
         r, p, y = self.imu_angle
         self.imu_angle[2] = self.unwrap_yaw(y)
@@ -248,6 +264,7 @@ class Controller(Node):
             [0, 1, np.sin(r)],
             [np.sin(p), 0, np.cos(r)*np.cos(p)]
         ])
+
         gyro_sensor = np.array([
             msg.angular_velocity.x,
             msg.angular_velocity.y,
