@@ -156,7 +156,7 @@
 
         <minDepth>0.0002</minDepth>
         <kp  value="1000000.0"/>
-        <kd  value="100.0"/>
+        <kd  value="10000.0"/>
 
         <restitution_coefficient>0.0</restitution_coefficient>
     </gazebo>
@@ -191,7 +191,7 @@
     <mu2>1.5</mu2>
     <minDepth>0.0002</minDepth>
     <kp  value="1000000.0"/>
-    <kd  value="100.0"/>
+    <kd  value="10000.0"/>
 
     <restitution_coefficient>0.0</restitution_coefficient>
 </gazebo>

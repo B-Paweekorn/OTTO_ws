@@ -76,7 +76,7 @@ class Controller(Node):
         [-6.0, -20.63, 2.0, -5.019, -4.37, 0.7, -1.707, 0]
         ])
 
-        self.K_height = 30
+        self.K_height = 5
 
         # ROS2 -----------------------------------------
 
@@ -158,8 +158,12 @@ class Controller(Node):
             
             # =============== HEIGHT MANNUAL Controller =================
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
-                legL_s = np.array([self.joint_state["q"][0], self.joint_state["q"][1]])
-                legR_s = np.array([self.joint_state["q"][3], self.joint_state["q"][4]])
+                # legL_s = np.array([self.joint_state["q"][0], self.joint_state["q"][1]])
+                # legR_s = np.array([self.joint_state["q"][3], self.joint_state["q"][4]])
+
+                legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
+                legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
+                
                 # qd_L = self.height_controller(legL_s, np.array(self.targL))
                 # self.q_kneeL_des += qd_L[0] * self.dt
                 # self.q_hipL_des += qd_L[1] * self.dt
@@ -184,16 +188,21 @@ class Controller(Node):
                 # R = 0.5*self.d*np.tan(np.arctan((self.whl_Lz-self.whl_Rz)/self.d)) + self.l
                 # R = 0.5*self.d*np.tan(-np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l)) - roll_s) - self.l
                 
+                roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
+                print(np.rad2deg(roll_cmd))
                 self.roll_s_i += 5 * (roll_s) * self.dt
-                roll_s_p =  roll_s * 3
+                roll_s_p =  roll_cmd + (roll_s) * 3
                 roll_s_d = self.gyro[0]
 
                 sign = np.sign(self.roll_s_i)
 
+                if abs(roll_s_p) >= np.deg2rad(30):
+                    roll_s_p = np.deg2rad(30) * np.sign(roll_s_p)
+                    
                 if abs(self.roll_s_i) >= np.deg2rad(30):
                     self.roll_s_i = np.deg2rad(30) * sign
 
-                R = 0.5*self.d*np.tan(self.roll_s_i + roll_s_p + roll_s_d*0.2) + self.l
+                R = 0.5*self.d*np.tan(roll_s_p + roll_s_d*0.1) + self.l
                 L = 2*self.l - R
 
                 # self.get_logger().info(f"log value: {np.arctan((R-L)/self.d)}, roll_s: {roll_s}")                
@@ -240,8 +249,7 @@ class Controller(Node):
         if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.0001:
             print("Singularlity!!")
             self.singularity = True
-            return [0, 0]
-        self.singularity = False
+            return np.zeros((2,1))
         err = targ - self.forward_kinematics(curr) # 1 x 2
         v = err * self.K_height
 
