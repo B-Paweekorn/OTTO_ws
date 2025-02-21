@@ -7,7 +7,7 @@ import signal
 import tf_transformations
 import numpy as np
 from geometry_msgs.msg import Twist
-from gazebo_msgs.msg import LinkStates
+from gazebo_msgs.msg import LinkStates, ModelStates
 
 # ROBOT PARAMETER
 class Controller(Node):
@@ -76,7 +76,7 @@ class Controller(Node):
         [-6.0, -20.63, 2.0, -5.019, -4.37, 0.7, -1.707, 0]
         ])
 
-        self.K_height = 5
+        self.K_height = 30
 
         # ROS2 -----------------------------------------
 
@@ -88,7 +88,7 @@ class Controller(Node):
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         
         self.create_subscription(LinkStates, '/gazebo/link_states', self.link_states_callback, 10)
-
+        # self.subscription = self.create_subscription(ModelStates, "/gazebo/model_states", self.model_states_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
         self.effort_msg = Float64MultiArray()
     
@@ -189,20 +189,22 @@ class Controller(Node):
                 # R = 0.5*self.d*np.tan(-np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l)) - roll_s) - self.l
                 
                 roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
-                print(np.rad2deg(roll_cmd))
                 self.roll_s_i += 5 * (roll_s) * self.dt
-                roll_s_p =  roll_cmd + (roll_s) * 3
-                roll_s_d = self.gyro[0]
 
+                roll_s_p =  (roll_s) * 3
+                roll_s_d = self.gyro[0] * 0.1
+
+                roll_u = roll_s_p + roll_s_d
+                
                 sign = np.sign(self.roll_s_i)
 
-                if abs(roll_s_p) >= np.deg2rad(30):
-                    roll_s_p = np.deg2rad(30) * np.sign(roll_s_p)
+                if abs(roll_u) >= np.deg2rad(30):
+                    roll_u = np.deg2rad(30) * np.sign(roll_s)
                     
                 if abs(self.roll_s_i) >= np.deg2rad(30):
                     self.roll_s_i = np.deg2rad(30) * sign
 
-                R = 0.5*self.d*np.tan(roll_s_p + roll_s_d*0.1) + self.l
+                R = 0.5*self.d*np.tan(roll_u) + self.l
                 L = 2*self.l - R
 
                 # self.get_logger().info(f"log value: {np.arctan((R-L)/self.d)}, roll_s: {roll_s}")                
