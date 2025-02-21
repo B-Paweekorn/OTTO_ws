@@ -7,6 +7,13 @@
       <uri>model://sun</uri>
     </include>
 
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+      <ros>
+        <namespace>/gazebo</namespace>
+      </ros>
+      <update_rate>100.0</update_rate>
+    </plugin>
+
     <include>
     <uri>model://ground_plane</uri>
     <pose>0 0 0 0 0 0</pose>
@@ -16,7 +23,7 @@
             <soft_cfm>0.00001</soft_cfm> <!-- Reduce numerical instability -->
             <soft_erp>0.8</soft_erp> <!-- Increase energy absorption -->
             <kp>1e6</kp>  <!-- High stiffness -->
-            <kd>10.0</kd>  <!-- Damping -->
+            <kd>1000.0</kd>  <!-- Damping -->
         </ode>
         </contact>
         <bounce>
@@ -25,8 +32,8 @@
         </bounce>
         <friction>
         <ode>
-            <mu>1.5</mu>  <!-- Increase friction -->
-            <mu2>1.5</mu2>
+            <mu>2.5</mu>  <!-- Increase friction -->
+            <mu2>2.5</mu2>
             <slip1>0.0</slip1>
             <slip2>0.0</slip2>
         </ode>
@@ -42,7 +49,7 @@ your shell.  -->
     <model name="ramp2">
       <static>true</static>
       <link name="nist_simple_ramp_120_link">
-        <pose>-5 0 -0.3 -0.523 0 0</pose>
+        <pose>-5 0 -0.4 -0.94 0 0</pose>
         <collision name="collision">
         <geometry>
             <mesh>
@@ -65,11 +72,11 @@ your shell.  -->
             </bounce>
             <friction>
             <ode>
-                <mu>1.0</mu>  <!-- High friction -->
-                <mu2>1.0</mu2>
-                <fdir1>0 1 0</fdir1>
+                <mu>1.5</mu>  <!-- High friction -->
+                <mu2>1.5</mu2>
+                <!-- <fdir1>0 1 0</fdir1>
                 <slip1>0.0</slip1>
-                <slip2>0.0</slip2>
+                <slip2>0.0</slip2> -->
             </ode>
             </friction>
         </surface>

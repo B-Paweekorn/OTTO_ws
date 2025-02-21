@@ -162,9 +162,9 @@
           </geometry>
       </visual>
       <collision>
-        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.04 0.0"/>
+        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.0 0.0"/>
         <geometry>
-            <cylinder radius="0.086" length="0.07416"/> 
+            <cylinder radius="0.086" length="0.0001"/> 
         </geometry>
       </collision>
       
@@ -175,7 +175,7 @@
       <child link="hip_motorL"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <!-- <limit effort="8.0"="50.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+        <!-- <limit effort="10.0"="50.0" lower="${-PI}" upper="${PI}" velocity="60"/> -->
     </joint>
 
     <joint name="hip_motorL_to_knee_motorL" type="fixed">
@@ -196,7 +196,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.22" friction="0.0"/>
-      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="10.0" velocity="60"/>
     </joint>
 
     <joint name="virtualhip_jointL" type="continuous">
@@ -205,7 +205,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 -0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.22" friction="0.0"/>
-      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="10.0" velocity="60"/>
     </joint>
 
     <joint name="wheel_jointL" type="continuous">
@@ -324,9 +324,9 @@
           </geometry>
       </visual>
       <collision>
-        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 -0.04 0.0"/>
+        <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 -0.0 0.0"/>
         <geometry>
-            <cylinder radius="0.086" length="0.07416"/> 
+            <cylinder radius="0.086" length="0.0001"/> 
         </geometry>
       </collision>
     </link> 
@@ -336,7 +336,7 @@
       <child link="hip_motorR"/>
         <origin rpy="0.0 0.0 0.0" xyz="-0.03 -0.06 0.0"/>
         <axis xyz="0.0 1.0 0.0"/>
-        <!-- <limit effort="5.0" lower="${-PI}" upper="${PI}" velocity="30"/> -->
+        <!-- <limit effort="5.0" lower="${-PI}" upper="${PI}" velocity="60"/> -->
       </joint>
 
 
@@ -358,7 +358,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.055 0.0"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.22" friction="0.0"/>
-      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="10.0" velocity="60"/>
     </joint>
 
     <joint name="virtualhip_jointR" type="continuous">
@@ -367,7 +367,7 @@
       <origin rpy="0.0 0.0 0.0" xyz="-0.1414 0.05 -0.1414"/>
       <axis xyz="0.0 1.0 0.0"/>
       <dynamics damping="0.22" friction="0.0"/>
-      <limit effort="8.0" lower="${-PI}" upper="${PI}" velocity="30"/>
+      <limit effort="10.0" velocity="60"/>
     </joint>
 
     <joint name="wheel_jointR" type="continuous">
@@ -383,7 +383,7 @@
       <gravity>true</gravity>
       <sensor name="imu_sensor" type="imu">
         <always_on>true</always_on>
-        <update_rate>500.0</update_rate>
+        <update_rate>3000.0</update_rate>
         <visualize>true</visualize>
         <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
           <topicName>otto_imu</topicName>
@@ -400,7 +400,7 @@
     </gazebo>
 
     <!-- LiDAR Sensor -->
-    <link name="lidar_link"/>
+    <!-- <link name="lidar_link"/>
 
     <joint name="lidar_joint" type="fixed">
         <parent link="base_link"/>
@@ -441,11 +441,11 @@
             <frameName>laser_link</frameName>
           </plugin>
         </sensor>
-    </gazebo>
+    </gazebo> -->
 
 
     <!-- Depth Camera -->
-    <link name="depth_link"/>
+    <!-- <link name="depth_link"/>
 
     <joint name="depth_camera_joint" type="fixed">
         <parent link="base_link"/>
@@ -497,6 +497,6 @@
 
             </plugin>
         </sensor>
-    </gazebo>
+    </gazebo> -->
   
 </robot>

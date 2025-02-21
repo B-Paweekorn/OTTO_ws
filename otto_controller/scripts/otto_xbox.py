@@ -15,7 +15,7 @@ class JoyControl(Node):
         self.leg_cmd = self.create_publisher(Float64MultiArray, '/legpose', 10)
 
         self.twist = Twist()
-        self.v_max = 1.5
+        self.v_max = 1.0
         self.w_max = 1.5
 
         self.max_height = -0.28
