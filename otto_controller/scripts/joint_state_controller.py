@@ -191,7 +191,7 @@ class Controller(Node):
                 roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
                 self.roll_s_i += 5 * (roll_s) * self.dt
 
-                roll_s_p =  (roll_s) * 3
+                roll_s_p =  (roll_s) * 5
                 roll_s_d = self.gyro[0] * 0.1
 
                 roll_u = roll_s_p + roll_s_d

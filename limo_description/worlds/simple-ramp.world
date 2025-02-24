@@ -23,7 +23,7 @@
             <soft_cfm>0.00001</soft_cfm> <!-- Reduce numerical instability -->
             <soft_erp>0.8</soft_erp> <!-- Increase energy absorption -->
             <kp>10</kp>  <!-- High stiffness -->
-            <kd>10000.0</kd>  <!-- Damping -->
+            <kd>100000.0</kd>  <!-- Damping -->
         </ode>
         </contact>
         <bounce>
@@ -49,7 +49,7 @@ your shell.  -->
     <model name="ramp2">
       <static>true</static>
       <link name="nist_simple_ramp_120_link">
-        <pose>0 2 -0.4 -0.94 0 0</pose>
+        <pose>0 2 -0.3 -0.94 0 0</pose>
         <collision name="collision">
         <geometry>
             <mesh>
@@ -61,9 +61,9 @@ your shell.  -->
             <contact>
             <ode>
                 <soft_cfm>0.00001</soft_cfm> <!-- Reduce numerical instability -->
-                <soft_erp>0.0</soft_erp> <!-- Increase energy restitution -->
+                <soft_erp>0.8</soft_erp> <!-- Increase energy restitution -->
                 <kp>10</kp>  <!-- High stiffness -->
-                <kd>10000.0</kd>  <!-- Damping -->
+                <kd>100000.0</kd>  <!-- Damping -->
             </ode>
             </contact>
             <bounce>
@@ -72,9 +72,8 @@ your shell.  -->
             </bounce>
             <friction>
             <ode>
-                <mu>1.5</mu>  <!-- High friction -->
-                <mu2>1.5</mu2>
-                <fdir1>0 1 0</fdir1>
+                <mu>1.1</mu>  <!-- High friction -->
+                <mu2>1.1</mu2>
                 <slip1>0.0</slip1>
                 <slip2>0.0</slip2>
             </ode>
