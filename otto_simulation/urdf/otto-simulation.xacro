@@ -164,7 +164,7 @@
       <collision>
         <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 0.0 0.0"/>
         <geometry>
-            <cylinder radius="0.086" length="0.0001"/> 
+            <cylinder radius="0.086" length="0.07"/> 
         </geometry>
       </collision>
       
@@ -326,7 +326,7 @@
       <collision>
         <origin rpy="${PI/2} 0.0 0.0" xyz="0.0 -0.0 0.0"/>
         <geometry>
-            <cylinder radius="0.086" length="0.0001"/> 
+            <cylinder radius="0.086" length="0.07"/> 
         </geometry>
       </collision>
     </link> 

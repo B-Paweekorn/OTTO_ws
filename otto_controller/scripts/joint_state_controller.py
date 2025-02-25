@@ -29,6 +29,8 @@ class Controller(Node):
         self.gyro = [0.0, 0.0, 0.0] # rpy
         self.accel = [0.0, 0.0, 0.0]
 
+        self.dth_s_filtered = 0.0
+        self.alpha = 0.1
         # command
         self.vx_cmd = 0
         self.prev_vx = 0
@@ -88,7 +90,6 @@ class Controller(Node):
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         
         self.create_subscription(LinkStates, '/gazebo/link_states', self.link_states_callback, 10)
-        # self.subscription = self.create_subscription(ModelStates, "/gazebo/model_states", self.model_states_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
         self.effort_msg = Float64MultiArray()
     
@@ -105,10 +106,11 @@ class Controller(Node):
         # state: x th1 th2 yaw dx dth1 dth2 dyaw x_i yaw_i
         # u: l_wheel r_wheel
         try:
-            # =============== State =================
+            # =============== State for Standing =================
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             dth_s = self.gyro[1]
-            w_s = self.gyro[2] #0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d 
+            self.dth_s_filtered = self.alpha * dth_s + (1 - self.alpha) * self.dth_s_filtered  # Low-pass filter
+            w_s = self.gyro[2] # 0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d 
 
             self.x_s += vx_s * self.dt
 
@@ -116,10 +118,14 @@ class Controller(Node):
             th_s = self.imu_angle[1]
             yaw_s = self.imu_angle[2]
 
+            # =============== Running State =================
+            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
+                th_s =  0.5 * (self.forward_kinematics([self.joint_state["q"][0], self.joint_state["q"][1]])[1] +  self.forward_kinematics([self.joint_state["q"][3], self.joint_state["q"][4]])[1]) + self.imu_angle[1]
+
             # =============== Command =================
             self.x_cmd += self.vx_cmd * self.dt
             self.yaw_cmd += self.w_cmd * self.dt
-            th_cmd = np.arcsin((2*self.mu*self.vx_cmd/self.r)/(self.m_b*self.l*self.g))
+            th_cmd = np.arcsin((2*self.mu*self.vx_cmd/self.r)/(self.m_b*self.l*self.g))*0
             ffw = (self.m_b*self.l*self.g*np.sin(th_cmd) - 2*self.mu*self.vx_cmd/self.r)/2
 
             # =============== LQR Controller =================
@@ -129,16 +135,9 @@ class Controller(Node):
             
             self.x_i += (self.x_s - self.x_cmd) * self.dt
 
-            # state_d = np.array([self.x_cmd, th_cmd, self.yaw_cmd, 
-            #                     0, 0, 0,
-            #                     0, 0])
             state_d = np.array([self.x_cmd, th_cmd, self.yaw_cmd, 
                                 self.vx_cmd, 0, self.w_cmd,
                                 0, 0])
-        
-            # state = np.array([self.x_s, th_s, yaw_s,
-            #                  vx_s, dth_s, w_s,
-            #                  self.x_i, 0])
 
             state = np.array([self.x_s, th_s, yaw_s,
                               vx_s, dth_s, w_s,
@@ -158,9 +157,6 @@ class Controller(Node):
             
             # =============== HEIGHT MANNUAL Controller =================
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
-                # legL_s = np.array([self.joint_state["q"][0], self.joint_state["q"][1]])
-                # legR_s = np.array([self.joint_state["q"][3], self.joint_state["q"][4]])
-
                 legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
                 legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
                 
@@ -188,35 +184,40 @@ class Controller(Node):
                 # R = 0.5*self.d*np.tan(np.arctan((self.whl_Lz-self.whl_Rz)/self.d)) + self.l
                 # R = 0.5*self.d*np.tan(-np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l)) - roll_s) - self.l
                 
-                roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
-                self.roll_s_i += 5 * (roll_s) * self.dt
+                #================
+                # roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
+                # self.roll_s_i += 5 * (roll_s) * self.dt
 
-                roll_s_p =  (roll_s) * 5
-                roll_s_d = self.gyro[0] * 0.1
+                # roll_s_p =  (roll_s) * 5
+                # roll_s_d = self.gyro[0] * 0.1
 
-                roll_u = roll_s_p + roll_s_d
+                # roll_u = roll_s_p + roll_s_d
                 
-                sign = np.sign(self.roll_s_i)
+                # sign = np.sign(self.roll_s_i)
 
-                if abs(roll_u) >= np.deg2rad(30):
-                    roll_u = np.deg2rad(30) * np.sign(roll_s)
+                # if abs(roll_u) >= np.deg2rad(30):
+                #     roll_u = np.deg2rad(30) * np.sign(roll_s)
                     
-                if abs(self.roll_s_i) >= np.deg2rad(30):
-                    self.roll_s_i = np.deg2rad(30) * sign
+                # if abs(self.roll_s_i) >= np.deg2rad(30):
+                #     self.roll_s_i = np.deg2rad(30) * sign
 
-                R = 0.5*self.d*np.tan(roll_u) + self.l
-                L = 2*self.l - R
+                # R = 0.5*self.d*np.tan(roll_u) + self.l
+                # L = 2*self.l - R
 
-                # self.get_logger().info(f"log value: {np.arctan((R-L)/self.d)}, roll_s: {roll_s}")                
-                self.targR[1] = -R
-                self.targL[1] = -L
-                qd_L = self.height_controller(legL_s, np.array(self.targL))
-                self.q_kneeL_des +=  qd_L[0] * self.dt
-                self.q_hipL_des += qd_L[1] * self.dt
+                # # self.get_logger().info(f"log value: {np.arctan((R-L)/self.d)}, roll_s: {roll_s}")                
+                # self.targR[1] = -R
+                # self.targL[1] = -L
+                # qd_L = self.height_controller(legL_s, np.array(self.targL))
+                # self.q_kneeL_des +=  qd_L[0] * self.dt
+                # self.q_hipL_des += qd_L[1] * self.dt
                 
-                qd_R = self.height_controller(legR_s, np.array(self.targR))
-                self.q_kneeR_des += qd_R[0] * self.dt
-                self.q_hipR_des += qd_R[1] * self.dt
+                # qd_R = self.height_controller(legR_s, np.array(self.targR))
+                # self.q_kneeR_des += qd_R[0] * self.dt
+                # self.q_hipR_des += qd_R[1] * self.dt
+
+                #==============
+                self.q_hipL_des = self.imu_angle[1] * 1.5  - self.joint_state["q"][1]  * 0.8
+                self.q_hipR_des = self.imu_angle[1] * 1.5  - self.joint_state["q"][4]  * 0.8
                 
                 if not self.singularity:
                     self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
@@ -228,7 +229,8 @@ class Controller(Node):
     def forward_kinematics(self, q):
         x = -self.l1*np.cos(np.deg2rad(45) - q[0]) + self.l2*np.cos(np.deg2rad(45) + q[1] + q[0])
         z = -self.l1*np.sin(np.deg2rad(45) - q[0]) - self.l2*np.sin(np.deg2rad(45) + q[1] + q[0])
-        return np.array([x,z])
+        theta = np.arctan(x/z)
+        return np.array([x,z]), theta
     
     def fnc_jacobian(self, q):
         J = np.array([[-self.l1*np.sin(np.deg2rad(45)-q[0]) - self.l2*np.sin(np.deg2rad(45)+q[0]+q[1]), -self.l2*np.sin(np.deg2rad(45)+q[0]+q[1])], 
@@ -252,7 +254,7 @@ class Controller(Node):
             print("Singularlity!!")
             self.singularity = True
             return np.zeros((2,1))
-        err = targ - self.forward_kinematics(curr) # 1 x 2
+        err = targ - self.forward_kinematics(curr)[0] # 1 x 2
         v = err * self.K_height
 
         q_dot = np.matmul(self.fnc_jacobian(curr)[1], np.transpose(v))
