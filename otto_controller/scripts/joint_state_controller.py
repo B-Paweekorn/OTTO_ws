@@ -44,6 +44,8 @@ class Controller(Node):
         self.whl_Rz = 0.0
         self.whl_Lz = 0.0
 
+        self.th_si = 0.0
+
         # yaw
         self.yaw_cmd = 0
         self.prev_yaw = 0.0
@@ -110,7 +112,7 @@ class Controller(Node):
             # =============== State for Standing =================
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             dth_s = self.gyro[1]
-            self.dth_s_filtered = self.alpha * dth_s + (1 - self.alpha) * self.dth_s_filtered  # Low-pass filter
+            self.dth_s_filtered = self.alpha * self.gyro[1] + (1 - self.alpha) * self.dth_s_filtered  # Low-pass filter
             w_s = self.gyro[2] # 0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d 
 
             self.x_s += vx_s * self.dt
@@ -219,9 +221,11 @@ class Controller(Node):
                 # self.q_hipR_des += qd_R[1] * self.dt
 
                 #==============
-                self.q_hipL_des = self.imu_angle[1] * 2.0
+                self.th_si += self.imu_angle[1] * 0.03
+                self.q_hipL_des = self.imu_angle[1] * 0.0 + self.th_si
                 self.q_hipR_des = self.q_hipL_des
                 
+
                 if not self.singularity:
                     self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
                     self.pos_cmd_pub.publish(self.pos_cmd_msg)
