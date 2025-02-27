@@ -80,6 +80,7 @@ class Controller(Node):
 
         self.K_height = 30
 
+        self.prev_th_s = 0.0
         # ROS2 -----------------------------------------
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
@@ -120,7 +121,9 @@ class Controller(Node):
 
             # =============== Running State =================
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
-                th_s =  0.5 * (self.forward_kinematics([self.joint_state["q"][0], self.joint_state["q"][1]])[1] +  self.forward_kinematics([self.joint_state["q"][3], self.joint_state["q"][4]])[1]) + self.imu_angle[1]
+                th_s =  0.5 * (self.forward_kinematics([self.joint_state["q"][0] + self.imu_angle[1], self.joint_state["q"][1]])[1] + self.forward_kinematics([self.joint_state["q"][3] + self.imu_angle[1], self.joint_state["q"][4]])[1])
+                dth_s = (th_s - self.prev_th_s)/self.dt
+                self.prev_th_s = th_s
 
             # =============== Command =================
             self.x_cmd += self.vx_cmd * self.dt
@@ -216,8 +219,8 @@ class Controller(Node):
                 # self.q_hipR_des += qd_R[1] * self.dt
 
                 #==============
-                self.q_hipL_des = self.imu_angle[1] * 1.5  - self.joint_state["q"][1]  * 0.8
-                self.q_hipR_des = self.imu_angle[1] * 1.5  - self.joint_state["q"][4]  * 0.8
+                self.q_hipL_des = self.imu_angle[1] * 2.0
+                self.q_hipR_des = self.q_hipL_des
                 
                 if not self.singularity:
                     self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
