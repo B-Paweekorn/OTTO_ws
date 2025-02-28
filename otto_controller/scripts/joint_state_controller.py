@@ -35,7 +35,7 @@ class Controller(Node):
         self.vx_cmd = 0
         self.prev_vx = 0
         self.w_cmd = 0
-
+        self.roll_cmd_i = 0.0
         # x_s
         self.x_s = 0
         self.x_cmd = 0
@@ -160,7 +160,7 @@ class Controller(Node):
             self.effort_msg.data = self.ctrl_input.tolist()
             self.effort_publisher.publish(self.effort_msg)
             
-            # =============== HEIGHT MANNUAL Controller =================
+            # =============== HEIGHT Controller =================
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
                 legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
                 legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
@@ -174,34 +174,34 @@ class Controller(Node):
                 self.l = 0.28
 
            # ======================= LEAN ANGLE TASK =======================
-                # self.targR[1] = (self.l + (self.vx_cmd*self.w_cmd*self.d)/(self.g*self.l*2))
-                # self.targL[1] = (2*self.l - self.targR[1])
-                # self.targR[1] = self.targR[1] * -1
-                # self.targL[1] = self.targL[1] * -1
-                # qd_L = self.height_controller(legL_s, np.array(self.targL))
-                # self.q_kneeL_des += qd_L[0] * self.dt
-                # self.q_hipL_des += qd_L[1] * self.dt
-                
-                # qd_R = self.height_controller(legR_s, np.array(self.targR))
-                # self.q_kneeR_des += qd_R[0] * self.dt
-                # self.q_hipR_des += qd_R[1] * self.dt
-                
-                # R = 0.5*self.d*np.tan(np.arctan((self.whl_Lz-self.whl_Rz)/self.d)) + self.l
-                # R = 0.5*self.d*np.tan(-np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l)) - roll_s) - self.l
-                
-                #================
-                # roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
-                self.roll_s_i += 4.0 * (roll_s) * self.dt
+                ROLL_KP = 3.0
+                ROLL_KI = 4.0
+                ROLL_KD = 0.5
+                ROLL_SATURATION = 30 # DEG
+                TORSO_KI = 0.05
 
-                roll_s_p =  (roll_s) * 3.0
-                roll_s_d = self.gyro[0] * 0.5
+                roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/self.g)
+                error = roll_cmd - self.roll_cmd_i
+
+                if abs(error) > 0.01:
+                    if self.roll_cmd_i < roll_cmd:
+                        self.roll_cmd_i = min(self.roll_cmd_i + 0.001, roll_cmd)
+                    elif self.roll_cmd_i > roll_cmd:
+                        self.roll_cmd_i = max(self.roll_cmd_i - 0.001, roll_cmd)
+
+                roll_s_p =  (roll_s) * ROLL_KP
+                self.roll_s_i += (roll_s) * self.dt * ROLL_KI * 0
+                roll_s_d = self.gyro[0] * ROLL_KD
 
                 roll_u = roll_s_p + roll_s_d + self.roll_s_i
                 
-                if abs(roll_u) >= np.deg2rad(30):
-                    roll_u = np.deg2rad(30) * np.sign(roll_s)
+                if abs(roll_u) >= np.deg2rad(ROLL_SATURATION):
+                    roll_u = np.deg2rad(ROLL_SATURATION) * np.sign(roll_u)
+                
+                if abs(roll_cmd) >= np.deg2rad(15):
+                    roll_cmd = np.deg2rad(15) * np.sign(roll_cmd)
 
-                R = 0.5*self.d*np.tan(roll_u) + self.l
+                R = 0.5*self.d*np.tan(self.roll_cmd_i) + self.l
                 L = 2*self.l - R
 
                 self.targR[1] = -R
@@ -212,12 +212,11 @@ class Controller(Node):
                 qd_R = self.height_controller(legR_s, np.array(self.targR))
                 self.q_hipR_des += qd_R[1] * self.dt
 
-                #==============
-                self.th_si += self.imu_angle[1] * 0.05
+           # ======================= TORSO ANGLE TASK =======================
+                self.th_si += self.imu_angle[1] * TORSO_KI
                 self.q_kneeL_des = self.th_si
                 self.q_kneeR_des = self.q_kneeL_des
                 
-
                 if not self.singularity:
                     self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
                     self.pos_cmd_pub.publish(self.pos_cmd_msg)
