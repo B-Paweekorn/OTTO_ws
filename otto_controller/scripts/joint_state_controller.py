@@ -80,7 +80,7 @@ class Controller(Node):
         [-6.0, -20.63, 2.0, -5.019, -4.37, 0.7, -1.707, 0]
         ])
 
-        self.K_height = 30
+        self.K_height = 7
 
         self.prev_th_s = 0.0
         # ROS2 -----------------------------------------
@@ -166,12 +166,12 @@ class Controller(Node):
                 legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
                 
                 # qd_L = self.height_controller(legL_s, np.array(self.targL))
-                # self.q_kneeL_des += qd_L[0] * self.dt
                 # self.q_hipL_des += qd_L[1] * self.dt
                 
-                # qd_R = self.height_controller(legR_s, np.array(self.targR))
-                # self.q_kneeR_des += qd_R[0] * self.dt
+                # qd_R = self.height_controller(legR_s, np.array(self.targL))
                 # self.q_hipR_des += qd_R[1] * self.dt
+
+                self.l = 0.28
 
            # ======================= LEAN ANGLE TASK =======================
                 # self.targR[1] = (self.l + (self.vx_cmd*self.w_cmd*self.d)/(self.g*self.l*2))
@@ -191,39 +191,31 @@ class Controller(Node):
                 
                 #================
                 # roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/(self.g*self.l))
-                # self.roll_s_i += 5 * (roll_s) * self.dt
+                self.roll_s_i += 4.0 * (roll_s) * self.dt
 
-                # roll_s_p =  (roll_s) * 5
-                # roll_s_d = self.gyro[0] * 0.1
+                roll_s_p =  (roll_s) * 3.0
+                roll_s_d = self.gyro[0] * 0.5
 
-                # roll_u = roll_s_p + roll_s_d
+                roll_u = roll_s_p + roll_s_d + self.roll_s_i
                 
-                # sign = np.sign(self.roll_s_i)
+                if abs(roll_u) >= np.deg2rad(30):
+                    roll_u = np.deg2rad(30) * np.sign(roll_s)
 
-                # if abs(roll_u) >= np.deg2rad(30):
-                #     roll_u = np.deg2rad(30) * np.sign(roll_s)
-                    
-                # if abs(self.roll_s_i) >= np.deg2rad(30):
-                #     self.roll_s_i = np.deg2rad(30) * sign
+                R = 0.5*self.d*np.tan(roll_u) + self.l
+                L = 2*self.l - R
 
-                # R = 0.5*self.d*np.tan(roll_u) + self.l
-                # L = 2*self.l - R
-
-                # # self.get_logger().info(f"log value: {np.arctan((R-L)/self.d)}, roll_s: {roll_s}")                
-                # self.targR[1] = -R
-                # self.targL[1] = -L
-                # qd_L = self.height_controller(legL_s, np.array(self.targL))
-                # self.q_kneeL_des +=  qd_L[0] * self.dt
-                # self.q_hipL_des += qd_L[1] * self.dt
+                self.targR[1] = -R
+                self.targL[1] = -L
+                qd_L = self.height_controller(legL_s, np.array(self.targL))
+                self.q_hipL_des += qd_L[1] * self.dt
                 
-                # qd_R = self.height_controller(legR_s, np.array(self.targR))
-                # self.q_kneeR_des += qd_R[0] * self.dt
-                # self.q_hipR_des += qd_R[1] * self.dt
+                qd_R = self.height_controller(legR_s, np.array(self.targR))
+                self.q_hipR_des += qd_R[1] * self.dt
 
                 #==============
-                self.th_si += self.imu_angle[1] * 0.03
-                self.q_hipL_des = self.imu_angle[1] * 0.0 + self.th_si
-                self.q_hipR_des = self.q_hipL_des
+                self.th_si += self.imu_angle[1] * 0.05
+                self.q_kneeL_des = self.th_si
+                self.q_kneeR_des = self.q_kneeL_des
                 
 
                 if not self.singularity:
