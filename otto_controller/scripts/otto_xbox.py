@@ -21,6 +21,7 @@ class JoyControl(Node):
         self.max_height = -0.28
         self.biped = Float64MultiArray()
         self.biped.data = [0.0, -0.28, 0.0, -0.28]
+        
     def joy_callback(self, msg):
         self.twist.linear.x = msg.axes[1] * self.v_max
         self.twist.angular.z = msg.axes[2] * self.w_max

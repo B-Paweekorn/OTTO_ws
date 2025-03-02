@@ -36,6 +36,8 @@ class Controller(Node):
         self.prev_vx = 0
         self.w_cmd = 0
         self.roll_cmd_i = 0.0
+        self.isCFAL = 0.0
+        
         # x_s
         self.x_s = 0
         self.x_cmd = 0
@@ -159,29 +161,28 @@ class Controller(Node):
 
             self.effort_msg.data = self.ctrl_input.tolist()
             self.effort_publisher.publish(self.effort_msg)
+
+            # ======================= LEAN ANGLE TASK =======================
             
-            # =============== HEIGHT Controller =================
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
                 legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
                 legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
                 
-                # qd_L = self.height_controller(legL_s, np.array(self.targL))
-                # self.q_hipL_des += qd_L[1] * self.dt
-                
-                # qd_R = self.height_controller(legR_s, np.array(self.targL))
-                # self.q_hipR_des += qd_R[1] * self.dt
-
-                self.l = 0.28
-
-           # ======================= LEAN ANGLE TASK =======================
                 ROLL_KP = 3.0
                 ROLL_KI = 4.0
                 ROLL_KD = 0.5
-                ROLL_SATURATION = 30 # DEG
+                ROLL_SATURATION = 45 # DEG
                 TORSO_KI = 0.05
 
-                roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/self.g)
+                if self.isCFAL:
+                    roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/self.g)
+                else:
+                    roll_cmd = 0.0
+
                 error = roll_cmd - self.roll_cmd_i
+                
+                if abs(roll_cmd) >= np.deg2rad(ROLL_SATURATION):
+                    roll_cmd = np.deg2rad(ROLL_SATURATION) * np.sign(roll_cmd)
 
                 if abs(error) > 0.01:
                     if self.roll_cmd_i < roll_cmd:
@@ -189,19 +190,21 @@ class Controller(Node):
                     elif self.roll_cmd_i > roll_cmd:
                         self.roll_cmd_i = max(self.roll_cmd_i - 0.001, roll_cmd)
 
-                roll_s_p =  (roll_s) * ROLL_KP
-                self.roll_s_i += (roll_s) * self.dt * ROLL_KI * 0
+                roll_s_p = roll_s * ROLL_KP
+
+                if not self.isCFAL:
+                    self.roll_s_i += roll_s * self.dt * ROLL_KI
+                else:
+                    self.roll_s_i = 0
+                    
                 roll_s_d = self.gyro[0] * ROLL_KD
 
                 roll_u = roll_s_p + roll_s_d + self.roll_s_i
                 
                 if abs(roll_u) >= np.deg2rad(ROLL_SATURATION):
                     roll_u = np.deg2rad(ROLL_SATURATION) * np.sign(roll_u)
-                
-                if abs(roll_cmd) >= np.deg2rad(15):
-                    roll_cmd = np.deg2rad(15) * np.sign(roll_cmd)
 
-                R = 0.5*self.d*np.tan(self.roll_cmd_i) + self.l
+                R = 0.5*self.d*np.tan(roll_u * (1 - self.isCFAL) + self.roll_cmd_i) + self.l
                 L = 2*self.l - R
 
                 self.targR[1] = -R
@@ -259,13 +262,13 @@ class Controller(Node):
         return q_dot # 2 x 1
 
     def legpose_callback(self, msg):
-        self.targL[0] = msg.data[0]
-        self.targL[1] = msg.data[1]
-        self.targR[0] = msg.data[2]
-        self.targR[1] = msg.data[3]
-        if self.targL + self.targR != self.prev_targ:
-            # print("received new target")
-            self.prev_targ = self.targL + self.targR
+        self.l = -msg.data[1]
+        if msg.data[3] > -0.25:
+            self.isCFAL = 1.0
+            self.roll_s_i = 0
+        else:
+            if abs(self.roll_cmd_i) < 0.05:
+                self.isCFAL = 0.0
 
     def cmd_vel_callback(self, msg):
         self.vx_cmd = msg.linear.x
