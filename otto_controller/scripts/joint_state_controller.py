@@ -167,9 +167,8 @@ class Controller(Node):
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
                 legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
                 legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
-                
-                ROLL_KP = 3.0
-                ROLL_KI = 4.0
+                ROLL_KP = 5.0
+                ROLL_KI = 4.0 * 0
                 ROLL_KD = 0.5
                 ROLL_SATURATION = 45 # DEG
                 TORSO_KI = 0.05
@@ -206,22 +205,22 @@ class Controller(Node):
 
                 R = 0.5*self.d*np.tan(roll_u * (1 - self.isCFAL) + self.roll_cmd_i) + self.l
                 L = 2*self.l - R
-
+                
                 self.targR[1] = -R
                 self.targL[1] = -L
-                qd_L = self.height_controller(legL_s, np.array(self.targL))
+
+                self.th_si += self.imu_angle[1] * TORSO_KI 
+
+                qd_L = self.leg_controller(legL_s, np.array(self.targL))
+                self.q_kneeL_des += (qd_L[0] + self.th_si*0) * self.dt
                 self.q_hipL_des += qd_L[1] * self.dt
                 
-                qd_R = self.height_controller(legR_s, np.array(self.targR))
+                qd_R = self.leg_controller(legR_s, np.array(self.targR))
+                self.q_kneeR_des += (qd_R[0] + self.th_si*0) * self.dt
                 self.q_hipR_des += qd_R[1] * self.dt
 
-           # ======================= TORSO ANGLE TASK =======================
-                self.th_si += self.imu_angle[1] * TORSO_KI
-                self.q_kneeL_des = self.th_si
-                self.q_kneeR_des = self.q_kneeL_des
-                
                 if not self.singularity:
-                    self.pos_cmd_msg.data = [self.q_kneeL_des, self.q_hipL_des, self.q_kneeR_des, self.q_hipR_des]
+                    self.pos_cmd_msg.data = [self.q_kneeL_des + self.th_si, self.q_hipL_des, self.q_kneeR_des + self.th_si, self.q_hipR_des]
                     self.pos_cmd_pub.publish(self.pos_cmd_msg)
             
         except (TypeError, IndexError, KeyError) as e:
@@ -250,7 +249,7 @@ class Controller(Node):
         except ValueError as e:
             self.get_logger().warn(f"Wheel link not found in /gazebo/link_states: {e}")
 
-    def height_controller(self, curr, targ):
+    def leg_controller(self, curr, targ):
         if abs(np.linalg.det(self.fnc_jacobian(curr)[0])) < 0.0001:
             print("Singularlity!!")
             self.singularity = True

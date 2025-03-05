@@ -30,7 +30,7 @@ def generate_launch_description():
         default_value=os.path.join(
             get_package_share_directory('limo_description'),
             'worlds',
-            'simple-ramp.world'
+            'ramp-test.world'
         )
     )
 
