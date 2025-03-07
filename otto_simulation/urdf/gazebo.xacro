@@ -23,35 +23,30 @@
               <state_interface name="effort"/>
         </joint> -->
         <joint name="knee_jointL">
-            <!-- <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
-              </command_interface> -->
-              <param name="pos_kp">220</param>
-              <param name="pos_ki">20</param>
-              <param name="pos_kd">8</param>
-              <param name="pos_max_integral_error">10000</param>
-        
-              <command_interface name="position_pid"/>
-
+            <command_interface name="effort">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+              </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
+              <state_interface name="velocity">
+                <param name="initial_value">0.0</param>
+              </state_interface>
               <state_interface name="effort"/>
+              
         </joint>
         <joint name="virtualhip_jointL">
-              <param name="pos_kp">300</param>
-              <param name="pos_ki">70</param>
-              <param name="pos_kd">10</param>
-              <param name="pos_max_integral_error">10000</param>
-        
-              <command_interface name="position_pid"/>
-
+            <command_interface name="effort">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+              </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
+              <state_interface name="velocity">
+                <param name="initial_value">0.0</param>
+              </state_interface>
               <state_interface name="effort"/>
         </joint>
         <joint name="wheel_jointL">
@@ -68,41 +63,31 @@
               <state_interface name="effort"/>
         </joint>
 
-        <!-- <joint name="hip_jointR">
+
+        <joint name="knee_jointR">
             <command_interface name="effort">
-                <param name="min">-10000</param>
-                <param name="max">10000</param>
+                <param name="min">-10</param>
+                <param name="max">10</param>
               </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
-              <state_interface name="effort"/>
-        </joint> -->
-        <joint name="knee_jointR">
-              <param name="pos_kp">220</param>
-              <param name="pos_ki">20</param>
-              <param name="pos_kd">8</param>
-              <param name="pos_max_integral_error">10000</param>
-        
-              <command_interface name="position_pid"/>
-              <state_interface name="position">
+              <state_interface name="velocity">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
               <state_interface name="effort"/>
         </joint>
         <joint name="virtualhip_jointR">
-              <param name="pos_kp">300</param>
-              <param name="pos_ki">70</param>
-              <param name="pos_kd">10</param>
-              <param name="pos_max_integral_error">10000</param>
-        
-              <command_interface name="position_pid"/>
+            <command_interface name="effort">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+              </command_interface>
               <state_interface name="position">
                 <param name="initial_value">0.0</param>
               </state_interface>
-              <state_interface name="velocity"/>
+              <state_interface name="velocity">
+                <param name="initial_value">0.0</param>
+              </state_interface>
               <state_interface name="effort"/>
         </joint>
         <joint name="wheel_jointR">

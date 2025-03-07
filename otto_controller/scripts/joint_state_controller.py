@@ -16,12 +16,11 @@ class Controller(Node):
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
 
         self.dt = 1/1000
-
+        self.dt_leg = 1/2000
         self.joint_state = {}
 
         # KL, VHL, WL, KR, VHR, WR
-        self.dof = 2
-        self.q_d = [0.0] * self.dof
+        self.dof = 6
         self.ctrl_input = [0.0] * self.dof
 
         # imu
@@ -85,11 +84,14 @@ class Controller(Node):
         self.K_height = 7
 
         self.prev_th_s = 0.0
+
+        # position control
+        self.prev_epos = [0.0, 0.0, 0.0, 0.0]
+
         # ROS2 -----------------------------------------
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
-
-        # ROS2 Wheel
+        self.position_timer = self.create_timer(self.dt_leg, self.pos_timer_callback)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
@@ -97,15 +99,21 @@ class Controller(Node):
         self.create_subscription(LinkStates, '/gazebo/link_states', self.link_states_callback, 10)
         self.effort_publisher = self.create_publisher(Float64MultiArray,'/effort_controller/commands',10)
         self.effort_msg = Float64MultiArray()
-    
-        # ROS2 Leg
-        self.pos_cmd_pub = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
-        self.create_subscription(Float64MultiArray, '/legpose', self.legpose_callback, 10)
 
-        self.pos_cmd_msg = Float64MultiArray()
+    def pos_timer_callback(self):
+        try:
+            targ = [0,0,0,0,0,0]
+            tau_position = self.position_control(targ)
+            self.ctrl_input[2] = tau_position[0]
+            for i in range(0,4):
+                self.ctrl_input[i+2] = tau_position[i]
 
-        # Ground Truth
-        self.create_subscription(LinkStates, '/gazebo/link_states', self.link_states_callback, 10)
+            self.effort_msg.data = self.ctrl_input
+            self.effort_publisher.publish(self.effort_msg)
+        
+        except (TypeError, IndexError, KeyError) as e:
+            self.get_logger().error(f"Error updating control input: {e}")
+
 
     def timer_callback(self):
         # state: x th1 th2 yaw dx dth1 dth2 dyaw x_i yaw_i
@@ -153,80 +161,31 @@ class Controller(Node):
             error = state_d - state
             U = self.K_lqr @ error
 
-            self.ctrl_input[0] = ffw + U[0]
-            self.ctrl_input[1] = ffw + U[1]
-
-            wheel_lim = 3.0
-            self.ctrl_input = np.clip(self.ctrl_input, -wheel_lim, wheel_lim)
-
-            self.effort_msg.data = self.ctrl_input.tolist()
-            self.effort_publisher.publish(self.effort_msg)
-
+            self.ctrl_input[0] = max(-3.0, min(3.0, ffw + U[0]))
+            self.ctrl_input[1] = max(-3.0, min(3.0, ffw + U[1]))
             # ======================= LEAN ANGLE TASK =======================
-            
-            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
-                legL_s = np.array([self.q_kneeL_des, self.q_hipL_des])
-                legR_s = np.array([self.q_kneeR_des, self.q_hipR_des])
-                ROLL_KP = 5.0
-                ROLL_KI = 4.0 * 0
-                ROLL_KD = 0.5
-                ROLL_SATURATION = 45 # DEG
-                TORSO_KI = 0.05
 
-                if self.isCFAL:
-                    roll_cmd = np.arctan(self.vx_cmd*self.w_cmd/self.g)
-                else:
-                    roll_cmd = 0.0
-
-                error = roll_cmd - self.roll_cmd_i
-                
-                if abs(roll_cmd) >= np.deg2rad(ROLL_SATURATION):
-                    roll_cmd = np.deg2rad(ROLL_SATURATION) * np.sign(roll_cmd)
-
-                if abs(error) > 0.01:
-                    if self.roll_cmd_i < roll_cmd:
-                        self.roll_cmd_i = min(self.roll_cmd_i + 0.001, roll_cmd)
-                    elif self.roll_cmd_i > roll_cmd:
-                        self.roll_cmd_i = max(self.roll_cmd_i - 0.001, roll_cmd)
-
-                roll_s_p = roll_s * ROLL_KP
-
-                if not self.isCFAL:
-                    self.roll_s_i += roll_s * self.dt * ROLL_KI
-                else:
-                    self.roll_s_i = 0
-                    
-                roll_s_d = self.gyro[0] * ROLL_KD
-
-                roll_u = roll_s_p + roll_s_d + self.roll_s_i
-                
-                if abs(roll_u) >= np.deg2rad(ROLL_SATURATION):
-                    roll_u = np.deg2rad(ROLL_SATURATION) * np.sign(roll_u)
-                
-
-
-                Rz = 0.5*self.d*np.tan(roll_u * (1 - self.isCFAL) + self.roll_cmd_i) + self.l
-                Lz = 2*self.l - Rz
-                
-                self.targR[1] = -Rz
-                self.targL[1] = -Lz
-
-                self.th_si += self.imu_angle[1] * TORSO_KI 
-
-                qd_L = self.leg_controller(legL_s, np.array(self.targL))
-                self.q_kneeL_des += (qd_L[0] + self.th_si*0) * self.dt
-                self.q_hipL_des += qd_L[1] * self.dt
-                
-                qd_R = self.leg_controller(legR_s, np.array(self.targR))
-                self.q_kneeR_des += (qd_R[0] + self.th_si*0) * self.dt
-                self.q_hipR_des += qd_R[1] * self.dt
-
-                if not self.singularity:
-                    self.pos_cmd_msg.data = [self.q_kneeL_des + self.th_si, self.q_hipL_des, self.q_kneeR_des + self.th_si, self.q_hipR_des]
-                    self.pos_cmd_pub.publish(self.pos_cmd_msg)
-            
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
+
+    def position_control(self,targ):
+        eLk = targ[0] - self.joint_state["q"][0]
+        tauLk = 70*eLk - 1.5*self.joint_state["qd"][0]
+        tauLk = max(-9.0, min(9.0, tauLk))
+
+        eLh = targ[1] - self.joint_state["q"][1]
+        tauLh = 50*eLh - 1.5*self.joint_state["qd"][1]
+        tauLh = max(-9.0, min(9.0, tauLh))
+
+        eRk = targ[2] - self.joint_state["q"][3]
+        tauRk = 70*eRk - 1.5*self.joint_state["qd"][3]
+        tauRk = max(-9.0, min(9.0, tauRk))
+
+        eRh = targ[3] - self.joint_state["q"][4]
+        tauRh = 50*eRh - 1.5*self.joint_state["qd"][4]
+        tauRh = max(-9.0, min(9.0, tauRh))
+
+        return tauLk, tauLh, tauRk, tauRh
 
     def forward_kinematics(self, q):
         x = -self.l1*np.cos(np.deg2rad(45) - q[0]) + self.l2*np.cos(np.deg2rad(45) + q[1] + q[0])

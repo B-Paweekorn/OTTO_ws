@@ -138,32 +138,21 @@ def generate_launch_description():
         )
     )
 
-    launch_description.add_action(
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=effort_controller_spawner,
-                on_exit=[position_controller_spawner],
-            )
-        )
-    )
-    
     # launch_description.add_action(
     #     RegisterEventHandler(
     #         event_handler=OnProcessExit(
-    #             target_action=position_controller_spawner,
-    #             on_exit=[lqr_controller],
+    #             target_action=effort_controller_spawner,
+    #             on_exit=[position_controller_spawner],
     #         )
     #     )
     # )
-
-    
 
     # Add nodes and launch files
     launch_description.add_action(rviz)
     launch_description.add_action(robot)
     launch_description.add_action(gazebo)
     launch_description.add_action(spawn_entity)
-    launch_description.add_action(lqr_controller)
+    # launch_description.add_action(lqr_controller)
 
     launch_description.add_action(joy)
 
