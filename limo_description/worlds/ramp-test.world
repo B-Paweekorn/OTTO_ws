@@ -2,6 +2,8 @@
 <sdf version="1.4">
   <world name="default">
 
+
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -48,8 +50,8 @@ include the models directory either in the launch file using <env.../>, or in
 your shell.  -->
     <model name="ramp3">
       <static>true</static>
-      <link name="ramp30_link">
-        <pose>0 2 0.15 1.57 0 0</pose>
+      <link name="rampStair_link">
+        <pose>2 0.5 0.15 1.57 0 0</pose>
         <collision name="collision">
         <geometry>
             <mesh>
@@ -72,8 +74,8 @@ your shell.  -->
             </bounce>
             <friction>
             <ode>
-                <mu>2.5</mu>
-                <mu2>2.0</mu2>
+                <mu>5.0</mu>
+                <mu2>5.0</mu2>
                 <slip1>0.0</slip1>
                 <slip2>0.0</slip2>
             </ode>

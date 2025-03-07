@@ -202,12 +202,14 @@ class Controller(Node):
                 
                 if abs(roll_u) >= np.deg2rad(ROLL_SATURATION):
                     roll_u = np.deg2rad(ROLL_SATURATION) * np.sign(roll_u)
-
-                R = 0.5*self.d*np.tan(roll_u * (1 - self.isCFAL) + self.roll_cmd_i) + self.l
-                L = 2*self.l - R
                 
-                self.targR[1] = -R
-                self.targL[1] = -L
+
+
+                Rz = 0.5*self.d*np.tan(roll_u * (1 - self.isCFAL) + self.roll_cmd_i) + self.l
+                Lz = 2*self.l - Rz
+                
+                self.targR[1] = -Rz
+                self.targL[1] = -Lz
 
                 self.th_si += self.imu_angle[1] * TORSO_KI 
 
@@ -225,7 +227,7 @@ class Controller(Node):
             
         except (TypeError, IndexError, KeyError) as e:
             self.get_logger().error(f"Error updating control input: {e}")
-    
+
     def forward_kinematics(self, q):
         x = -self.l1*np.cos(np.deg2rad(45) - q[0]) + self.l2*np.cos(np.deg2rad(45) + q[1] + q[0])
         z = -self.l1*np.sin(np.deg2rad(45) - q[0]) - self.l2*np.sin(np.deg2rad(45) + q[1] + q[0])
