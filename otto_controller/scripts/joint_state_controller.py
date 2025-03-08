@@ -84,7 +84,7 @@ class Controller(Node):
         self.K_height = 7
 
         self.prev_th_s = 0.0
-
+        self.prev_e_split = 0.0
         # position control
         self.prev_epos = [0.0, 0.0, 0.0, 0.0]
 
@@ -104,9 +104,20 @@ class Controller(Node):
         try:
             targ = [0,0,0,0,0,0]
             tau_position = self.position_control(targ)
+            xL = self.forward_kinematics([self.joint_state["q"][0] + self.imu_angle[1], self.joint_state["q"][1]])[0][0] 
+            xR = self.forward_kinematics([self.joint_state["q"][3] + self.imu_angle[1], self.joint_state["q"][4]])[0][0]
+            e_split = xL - xR
+            ed_split = (e_split - self.prev_e_split)/self.dt_leg
+            self.prev_e_split = e_split
+            # print(xL, xR, e_split)
+            tau_split = e_split * 150 + ed_split* 5
             self.ctrl_input[2] = tau_position[0]
             for i in range(0,4):
                 self.ctrl_input[i+2] = tau_position[i]
+
+            if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
+                self.ctrl_input[2] = (7.5 * self.imu_angle[1]) + (4.5 * self.gyro[1]) + tau_split
+                self.ctrl_input[4] = self.ctrl_input[2] - tau_split
 
             self.effort_msg.data = self.ctrl_input
             self.effort_publisher.publish(self.effort_msg)
@@ -123,7 +134,7 @@ class Controller(Node):
             vx_s = (self.joint_state["qd"][2] + self.joint_state["qd"][5])*0.5*self.r
             dth_s = self.gyro[1]
             self.dth_s_filtered = self.alpha * self.gyro[1] + (1 - self.alpha) * self.dth_s_filtered  # Low-pass filter
-            w_s = self.gyro[2] # 0.5*(self.joint_state["qd"][5] - self.joint_state["qd"][2])*self.r/self.d 
+            w_s = self.gyro[2]
 
             self.x_s += vx_s * self.dt
 
@@ -170,19 +181,19 @@ class Controller(Node):
 
     def position_control(self,targ):
         eLk = targ[0] - self.joint_state["q"][0]
-        tauLk = 70*eLk - 1.5*self.joint_state["qd"][0]
+        tauLk = 70*eLk - 2.0*self.joint_state["qd"][0]
         tauLk = max(-9.0, min(9.0, tauLk))
 
         eLh = targ[1] - self.joint_state["q"][1]
-        tauLh = 50*eLh - 1.5*self.joint_state["qd"][1]
+        tauLh = 50*eLh - 2.0*self.joint_state["qd"][1]
         tauLh = max(-9.0, min(9.0, tauLh))
 
         eRk = targ[2] - self.joint_state["q"][3]
-        tauRk = 70*eRk - 1.5*self.joint_state["qd"][3]
+        tauRk = 70*eRk - 2.0*self.joint_state["qd"][3]
         tauRk = max(-9.0, min(9.0, tauRk))
 
         eRh = targ[3] - self.joint_state["q"][4]
-        tauRh = 50*eRh - 1.5*self.joint_state["qd"][4]
+        tauRh = 50*eRh - 2.0*self.joint_state["qd"][4]
         tauRh = max(-9.0, min(9.0, tauRh))
 
         return tauLk, tauLh, tauRk, tauRh
