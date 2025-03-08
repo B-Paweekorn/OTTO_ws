@@ -67,7 +67,7 @@ class Controller(Node):
         self.r = 0.086
         self.d = 0.270
         self.l = 0.2828
-        self.g = 9.81
+        self.g = 9.80
         self.m_b = 1.5
         self.mu = 0.001
 
@@ -85,6 +85,7 @@ class Controller(Node):
 
         self.prev_th_s = 0.0
         self.prev_e_split = 0.0
+        self.prev_eL = 0.0
         # position control
         self.prev_epos = [0.0, 0.0, 0.0, 0.0]
 
@@ -92,6 +93,7 @@ class Controller(Node):
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
         self.position_timer = self.create_timer(self.dt_leg, self.pos_timer_callback)
+        self.create_subscription(Float64MultiArray, '/legpose', self.legpose_callback, 10)
         self.create_subscription(JointState,'/joint_states',self.feedback_callback,10)
         self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
         self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
@@ -118,6 +120,18 @@ class Controller(Node):
             if self.get_clock().now().seconds_nanoseconds()[0] - self.start_time >= 10:
                 self.ctrl_input[2] = (7.5 * self.imu_angle[1]) + (4.5 * self.gyro[1]) + tau_split
                 self.ctrl_input[4] = self.ctrl_input[2] - tau_split
+
+                L_s = -0.5 * (self.forward_kinematics([self.joint_state["q"][0] + self.imu_angle[1], self.joint_state["q"][1]])[0][1] + self.forward_kinematics([self.joint_state["q"][3] + self.imu_angle[1], self.joint_state["q"][4]])[0][1])
+                e_L = self.l - L_s
+                ed_L = (e_L - self.prev_eL)/self.dt_leg
+                self.prev_eL = e_L
+
+                JL = self.fnc_jacobian([self.joint_state["q"][0], self.joint_state["q"][1]])[0]
+                JR = self.fnc_jacobian([self.joint_state["q"][3], self.joint_state["q"][4]])[0]
+                
+                self.ctrl_input[3] =  -float((JL.T @ np.array([[0.0], [1.1*self.g]]))[1]) + e_L * 80 + ed_L * 5 - (self.imu_angle[0]*40 + self.gyro[0]*5)
+                self.ctrl_input[5] =  -float((JR.T @ np.array([[0.0], [1.1*self.g]]))[1]) + e_L * 80 + ed_L * 5 + (self.imu_angle[0]*40 + self.gyro[0]*5)
+
 
             self.effort_msg.data = self.ctrl_input
             self.effort_publisher.publish(self.effort_msg)
